@@ -1,8 +1,33 @@
 flows:
-  transfer_money:
-    description: Help users send money to friends and family.
+  anger_regulation_really_mad:
+    description: Help child calm down from "really mad" to "less mad" using counting and communication.
     steps:
-      - collect: recipient
-      - collect: amount
-        description: the number of US dollars to send
-      - action: utter_transfer_complete
+      - collect: emotional_state
+        description: Child selects "really mad"
+      - action: utter_greet_angry
+      - collect: trigger_situation
+        description: What happened
+      - action: utter_acknowledge_situation
+      - action: utter_validate_anger
+      - action: utter_suggest_counting
+      - action: utter_count_together
+      - action: utter_normalize_feeling
+      - collect: final_emotional_state
+        description: How they feel now
+      - action: utter_praise_progress
+
+  anger_regulation_annoyed:
+    description: Help child reframe "a bit annoyed" and try a simple communication step.
+    steps:
+      - collect: emotional_state
+        description: Child selects "a bit annoyed"
+      - action: utter_greet_annoyed
+      - collect: trigger_situation
+        description: What's bugging them
+      - action: utter_acknowledge_friend_situation
+      - action: utter_validate_frustration
+      - action: utter_suggest_communication
+      - action: utter_check_final_feeling
+      - collect: final_emotional_state
+        description: How they feel now
+      - action: utter_celebrate_improvement
