@@ -1,33 +1,54 @@
 flows:
-  anger_regulation_really_mad:
-    description: Help child calm down from "really mad" to "less mad" using counting and communication.
+  select_emotional_state:
+    description: Initial emotional state selection
     steps:
       - collect: emotional_state
-        description: Child selects "really mad"
+        description: Child selects their current emotional state
+
+  handle_really_mad:
+    description: Handle really mad child - brother scenario
+    steps:
       - action: utter_greet_angry
       - collect: trigger_situation
-        description: What happened
+        description: What made them angry
       - action: utter_acknowledge_situation
-      - action: utter_validate_anger
-      - action: utter_suggest_counting
-      - action: utter_count_together
-      - action: utter_normalize_feeling
-      - collect: final_emotional_state
-        description: How they feel now
-      - action: utter_praise_progress
 
-  anger_regulation_annoyed:
-    description: Help child reframe "a bit annoyed" and try a simple communication step.
+  continue_anger_help:
+    description: Continue helping with anger management
     steps:
-      - collect: emotional_state
-        description: Child selects "a bit annoyed"
+      - action: utter_validate_anger
+      - collect: wants_counting
+        description: If they want to try counting
+      - action: utter_suggest_counting
+
+  do_counting_exercise:
+    description: Guide through counting exercise
+    steps:
+      - action: utter_count_together
+      - collect: counting_feeling
+        description: How they feel after counting
+      - action: utter_normalize_feeling
+
+  handle_annoyed:
+    description: Handle annoyed child - friend scenario
+    steps:
       - action: utter_greet_annoyed
       - collect: trigger_situation
-        description: What's bugging them
+        description: What's bothering them
       - action: utter_acknowledge_friend_situation
+
+  continue_annoyed_help:
+    description: Continue helping with friend situation
+    steps:
       - action: utter_validate_frustration
+      - collect: wants_communication
+        description: If they want to try communication
       - action: utter_suggest_communication
+
+  check_final_state:
+    description: Check how they feel after help
+    steps:
       - action: utter_check_final_feeling
       - collect: final_emotional_state
-        description: How they feel now
+        description: Final emotional state
       - action: utter_celebrate_improvement
