@@ -15,6 +15,15 @@ slots:
       - type: from_llm
 
 responses:
+  utter_ask_emotional_state:
+    - text: "How are you feeling right now, can you pick one, for example [translate:really mad], [translate:a bit annoyed], [translate:okay]?"
+
+  utter_ask_trigger_situation:
+    - text: "What happened, tell me in a few words"
+
+  utter_ask_final_emotional_state:
+    - text: "How are you feeling now after we tried that, you can pick [translate:really mad], [translate:a bit annoyed], [translate:okay]"
+
   utter_greet_angry:
     - text: "I can see you're feeling really angry right now. What happened?"
 
