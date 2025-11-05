@@ -1,34 +1,68 @@
 version: "3.1"
 
 slots:
-  recipient:
+  emotional_state:
     type: text
     mappings:
       - type: from_llm
-  amount:
-    type: float
+  trigger_situation:
+    type: text
+    mappings:
+      - type: from_llm
+  final_emotional_state:
+    type: text
     mappings:
       - type: from_llm
 
 responses:
-  utter_ask_recipient:
-    - text: "Who would you like to send money to?"
+  utter_greet_angry:
+    - text: "I can see you're feeling really angry right now. What happened?"
 
-  utter_ask_amount:
-    - text: "How much money would you like to send?"
+  utter_greet_annoyed:
+    - text: "I see you're feeling a bit annoyed. What's bugging you today?"
 
-  utter_transfer_complete:
-    - text: "All done. {amount} has been sent to {recipient}."
+  utter_acknowledge_situation:
+    - text: "Sounds like that was really frustrating. Brothers can be annoying sometimes. Do you feel unheard?"
+
+  utter_validate_anger:
+    - text: "I get that you're upset. Getting super angry won't fix it though. Want to try something that might help you feel calmer?"
+
+  utter_suggest_counting:
+    - text: "Cool. When I feel worked up, I count to ten slowly. Wanna give it a shot?"
+
+  utter_count_together:
+    - text: "Alright, let's count together... 1... 2... 3... How's that feeling?"
+
+  utter_normalize_feeling:
+    - text: "That's totally normal. At least you're not as heated as before. You can go to him and say 'Hey, I need my controller back now' in a calm voice."
+
+  utter_praise_progress:
+    - text: "Nice work! You went from really mad to just a little mad. That's actually pretty good."
+
+  utter_acknowledge_friend_situation:
+    - text: "That sounds disappointing when someone doesn't follow through. Do you feel unheard?"
+
+  utter_validate_frustration:
+    - text: "I get why that would be frustrating. Sometimes people get busy and forget though. Want to think about what you could do about it?"
+
+  utter_suggest_communication:
+    - text: "You could send her a quick message like 'Hey, just checking in'. That way you'll know if she's just busy or if something else is going on."
+
+  utter_check_final_feeling:
+    - text: "How are you feeling now about the whole situation?"
+
+  utter_celebrate_improvement:
+    - text: "Nice! You went from annoyed to okay. That's pretty good problem-solving."
 
   utter_free_chitchat_response:
     - text: "placeholder"
       metadata:
         rephrase: True
         rephrase_prompt: |
-          The following is a conversation with an AI assistant built with Rasa.
-          The assistant can help the user transfer money.
-          The assistant is helpful, creative, clever, and very friendly.
-          The user is making small talk, and the assistant should respond, keeping things light.
+          The following is a conversation with an AI assistant built with Rasa for emotion regulation.
+          The assistant helps children aged 10-14 manage their anger and emotions.
+          The assistant is caring, supportive, patient, and uses child-friendly language.
+          The user might be sharing feelings or making small talk.
           Context / previous conversation with the user:
           {{history}}
           {{current_input}}
