@@ -1,8 +1,7 @@
 flows:
-  transfer_money:
-    description: Help users send money to friends and family.
+  help_emotion:
+    description: Help user deal with their emotions in a concrete way. The user is a child aged approximately 10.
     steps:
-      - collect: recipient
-      - collect: amount
-        description: the number of US dollars to send
-      - action: utter_transfer_complete
+      - collect: emotion
+        description: the level of emotion the user is experiencing
+      - action: provide_coping
