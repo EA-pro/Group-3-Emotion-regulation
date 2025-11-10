@@ -1,54 +1,71 @@
 flows:
-  select_emotional_state:
-    description: Initial emotional state selection
+  # Path 1: Sibling Conflict - Really Mad to Calmer
+  sibling_conflict_flow:
+    description: Handle anger from sibling conflicts with counting exercise
     steps:
       - collect: emotional_state
-        description: Child selects their current emotional state
-
-  handle_really_mad:
-    description: Handle really mad child - brother scenario
-    steps:
-      - action: utter_greet_angry
-      - collect: trigger_situation
-        description: What made them angry
+        description: Child selects emotional state
+        next:
+          - if: slots.emotional_state == "really mad"
+            then:
+              - action: utter_greet_angry
+              - collect: trigger_situation
+                description: Ask what happened
       - action: utter_acknowledge_situation
-
-  continue_anger_help:
-    description: Continue helping with anger management
-    steps:
       - action: utter_validate_anger
       - collect: wants_counting
-        description: If they want to try counting
-      - action: utter_suggest_counting
+        description: Ask if they want to try counting
+      - if: slots.wants_counting in ["yes", "yeah", "ok", "fine", "I guess"]
+        then:
+          - action: utter_count_together
+          - collect: counting_feeling
+            description: Check how they feel after counting
+          - action: utter_normalize_feeling
+          - action: utter_check_final_feeling
+          - collect: final_emotional_state
+            description: Final emotional check
+          - action: utter_praise_progress
 
-  do_counting_exercise:
-    description: Guide through counting exercise
+  # Path 2: Friend Issue - Annoyed to Okay
+  friend_issue_flow:
+    description: Handle friend disappointment with communication strategy
     steps:
-      - action: utter_count_together
-      - collect: counting_feeling
-        description: How they feel after counting
-      - action: utter_normalize_feeling
-
-  handle_annoyed:
-    description: Handle annoyed child - friend scenario
-    steps:
-      - action: utter_greet_annoyed
-      - collect: trigger_situation
-        description: What's bothering them
+      - collect: emotional_state
+        description: Child selects emotional state
+        next:
+          - if: slots.emotional_state == "a bit annoyed"
+            then:
+              - action: utter_greet_annoyed
+              - collect: trigger_situation
+                description: Ask what's bothering them
       - action: utter_acknowledge_friend_situation
-
-  continue_annoyed_help:
-    description: Continue helping with friend situation
-    steps:
       - action: utter_validate_frustration
       - collect: wants_communication
-        description: If they want to try communication
-      - action: utter_suggest_communication
+        description: Ask if they want to try communication
+      - if: slots.wants_communication in ["yes", "yeah", "ok", "maybe", "I guess"]
+        then:
+          - action: utter_suggest_communication
+          - action: utter_acknowledge_willingness
+          - action: utter_check_final_feeling
+          - collect: final_emotional_state
+            description: Final emotional check
+          - action: utter_celebrate_improvement
 
-  check_final_state:
-    description: Check how they feel after help
+  # Path 3: General Support Flow
+  general_support_flow:
+    description: Simple support flow for any emotion
     steps:
+      - collect: emotional_state
+        description: Child selects emotional state
+      - action: utter_ask_trigger_situation
+      - collect: trigger_situation
+        description: What's bothering them
+      - action: utter_general_acknowledgment
+      - action: utter_offer_help
+      - collect: help_preference
+        description: What kind of help they want
+      - action: utter_provide_strategy
       - action: utter_check_final_feeling
       - collect: final_emotional_state
-        description: Final emotional state
-      - action: utter_celebrate_improvement
+        description: Final emotional check
+      - action: utter_general_praise
