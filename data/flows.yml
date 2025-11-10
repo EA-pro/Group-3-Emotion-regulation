@@ -25,8 +25,12 @@ flows:
                       - collect: final_emotional_state
                         description: Final emotional check
                       - action: utter_praise_progress
+                        next:
+                          - link: END
                   - else:
                       - action: utter_offer_help
+                        next:
+                          - link: END
 
   friend_issue_flow:
     description: Handle friend disappointment with communication strategy
@@ -52,8 +56,12 @@ flows:
                       - collect: final_emotional_state
                         description: Final emotional check
                       - action: utter_celebrate_improvement
+                        next:
+                          - link: END
                   - else:
                       - action: utter_offer_help
+                        next:
+                          - link: END
 
   general_support_flow:
     description: Simple support flow for any emotion
@@ -72,3 +80,5 @@ flows:
       - collect: final_emotional_state
         description: Final emotional check
       - action: utter_general_praise
+        next:
+          - link: END
