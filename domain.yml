@@ -25,25 +25,32 @@ slots:
     type: text
     mappings:
       - type: from_llm
+  help_preference:
+    type: text
+    mappings:
+      - type: from_llm
 
 responses:
   utter_ask_emotional_state:
-    - text: "How are you feeling right now, can you pick one, for example [translate:really mad], [translate:a bit annoyed], [translate:okay]?"
+    - text: "How are you feeling right now? You can pick 'really mad', 'a bit annoyed', or 'okay'"
 
   utter_ask_trigger_situation:
-    - text: "What happened, tell me in a few words"
+    - text: "What happened? Tell me in a few words"
 
   utter_ask_final_emotional_state:
-    - text: "How are you feeling now after we tried that, you can pick [translate:really mad], [translate:a bit annoyed], [translate:okay]"
+    - text: "How are you feeling now after we tried that?"
 
   utter_ask_wants_counting:
-    - text: "Would you like to try counting to calm down? Say yes or no"
+    - text: "Would you like to try counting to calm down?"
 
   utter_ask_counting_feeling:
-    - text: "How do you feel after counting? Better or still angry?"
+    - text: "How do you feel after counting?"
 
   utter_ask_wants_communication:
-    - text: "Would you like to try talking to them about it? Say yes or no"
+    - text: "Would you like to try talking to them about it?"
+
+  utter_ask_help_preference:
+    - text: "What would help you right now? Counting, talking about it, or something else?"
 
   utter_greet_angry:
     - text: "I can see you're feeling really angry right now. What happened?"
@@ -52,37 +59,49 @@ responses:
     - text: "I see you're feeling a bit annoyed. What's bugging you today?"
 
   utter_acknowledge_situation:
-    - text: "Sounds like that was really frustrating. Brothers can be annoying sometimes. Do you feel unheard?"
+    - text: "Sounds like that was really frustrating. Brothers can be annoying sometimes."
 
   utter_validate_anger:
     - text: "I get that you're upset. Getting super angry won't fix it though. Want to try something that might help you feel calmer?"
-
-  utter_suggest_counting:
-    - text: "Cool. When I feel worked up, I count to ten slowly. Wanna give it a shot?"
 
   utter_count_together:
     - text: "Alright, let's count together... 1... 2... 3... How's that feeling?"
 
   utter_normalize_feeling:
-    - text: "That's totally normal. At least you're not as heated as before. You can go to him and say 'Hey, I need my controller back now' in a calm voice."
+    - text: "That's totally normal. At least you're not as heated as before."
 
   utter_praise_progress:
-    - text: "Nice work! You went from really mad to just a little mad. That's actually pretty good."
+    - text: "Nice work! You went from really mad to calmer. That's actually pretty good."
 
   utter_acknowledge_friend_situation:
-    - text: "That sounds disappointing when someone doesn't follow through. Do you feel unheard?"
+    - text: "That sounds disappointing when someone doesn't follow through."
 
   utter_validate_frustration:
-    - text: "I get why that would be frustrating. Sometimes people get busy and forget though. Want to think about what you could do about it?"
+    - text: "I get why that would be frustrating. Sometimes people get busy and forget though."
 
   utter_suggest_communication:
     - text: "You could send her a quick message like 'Hey, just checking in'. That way you'll know if she's just busy or if something else is going on."
+
+  utter_acknowledge_willingness:
+    - text: "That sounds like a good plan. Sometimes the simple approach works best."
 
   utter_check_final_feeling:
     - text: "How are you feeling now about the whole situation?"
 
   utter_celebrate_improvement:
-    - text: "Nice! You went from annoyed to okay. That's pretty good problem-solving."
+    - text: "Nice! That's pretty good problem-solving."
+
+  utter_general_acknowledgment:
+    - text: "I hear you. That sounds tough."
+
+  utter_offer_help:
+    - text: "Let's figure out what might help you feel better."
+
+  utter_provide_strategy:
+    - text: "That's a good approach. Give it a try and see how it goes."
+
+  utter_general_praise:
+    - text: "Good job working through that with me. You're doing great."
 
   utter_free_chitchat_response:
     - text: "placeholder"
