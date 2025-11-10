@@ -1,9 +1,9 @@
 patterns:
-  - id: ask_emotion
-    description: Ask the user about their emotion if the conversation needs clarity
+  - id: greetings
+    description: Handles greetings, goodbyes, simple chitchat (hi, hello, how are you, bye, etc.)
     steps:
-      - action: utter_ask_emotion
-  - id: inform_acknowledge
-    description: Acknowledge user's emotion when they share it
+      - action: utter_greet
+  - id: fallback_acknowledge
+    description: Handles unclear or negative user feedback with a clarifying or empathetic response
     steps:
-      - action: utter_acknowledge_emotion
+      - action: utter_clarify_or_empathize
