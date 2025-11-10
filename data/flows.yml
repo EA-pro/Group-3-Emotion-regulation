@@ -2,48 +2,41 @@ flows:
   mad_happy_path:
     description: Child is really mad and chat support guides emotional regulation via counting
     steps:
-      - action: utter_greet_angry
+      - collect: emotional_state
+        description: Select emotional state (e.g. really mad)
       - collect: mad_reason
         description: Reason for being really mad
       - action: utter_acknowledge_anger
       - collect: wants_counting
         description: Would you like to try counting?
-        next:
-          - if: slots.wants_counting in ["yes", "yeah", "ok", "fine", "I guess"]
-            then:
-              - action: utter_start_counting
-              - collect: counting_feeling
-                description: How does that feel now?
-              - action: utter_reframe_anger
-              - collect: final_madness
-                description: Are you still really mad?
-              - action: utter_praise_emotion_change
-            # If user doesn't want counting
-          - else:
-              - action: utter_encourage_alternative
+      - action: utter_do_counting
+      - collect: counting_feeling
+        description: How do you feel after counting?
+      - action: utter_normalize_feeling
+      - collect: final_madness
+        description: Are you still really mad?
+      - action: utter_praise_emotion_change
+
   annoyed_happy_path:
     description: Child is a bit annoyed and bot guides reframing and easy solution
     steps:
-      - action: utter_greet_annoyed
+      - collect: emotional_state
+        description: Select emotional state (e.g. a bit annoyed)
       - collect: annoyed_reason
         description: What's bugging you?
       - action: utter_acknowledge_annoyed
       - collect: wants_solution
-        description: Would you like a suggestion/solution?
-        next:
-          - if: slots.wants_solution in ["yes", "maybe", "ok"]
-            then:
-              - action: utter_suggest_solution
-              - action: utter_acknowledge_success
-              - collect: final_annoyance
-                description: Are you still annoyed?
-              - action: utter_praise_emotion_change
-          - else:
-              - action: utter_encourage_alternative
+        description: Would you like a suggestion or solution?
+      - action: utter_suggest_solution
+      - collect: final_annoyance
+        description: Are you still annoyed?
+      - action: utter_praise_emotion_change
+
   guardian_happy_path:
     description: Guardian requests update and advice about child's anger
     steps:
-      - action: utter_greet_guardian
+      - collect: guardian_request
+        description: Guardian asks for update
       - action: utter_report_guardian
       - collect: guardian_wants_advice
         description: What do you want to know?
