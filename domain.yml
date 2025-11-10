@@ -1,6 +1,10 @@
 version: "3.1"
 
 slots:
+  user_greeting:
+    type: text
+    mappings:
+      - type: from_llm
   user_emotion:
     type: text
     mappings:
@@ -19,6 +23,12 @@ slots:
       - type: from_llm
 
 responses:
+  utter_greet:
+    - text: "Hi there! I'm here to listen. How are you feeling today?"
+    - text: "Hello! What would you like to talk about?"
+    - text: "Hey! You can tell me what's on your mind."
+  utter_clarify_greeting:
+    - text: "If you want to say hi, just type 'hello', 'hi', or anything you'd like."
   utter_ask_user_emotion:
     - text: "How are you feeling right now? You can say anything like sad, angry, lonely, etc."
   utter_clarify_emotion:
