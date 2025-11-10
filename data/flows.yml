@@ -1,5 +1,4 @@
 flows:
-  # Path 1: Sibling Conflict - Really Mad to Calmer
   sibling_conflict_flow:
     description: Handle anger from sibling conflicts with counting exercise
     steps:
@@ -11,22 +10,24 @@ flows:
               - action: utter_greet_angry
               - collect: trigger_situation
                 description: Ask what happened
-      - action: utter_acknowledge_situation
-      - action: utter_validate_anger
-      - collect: wants_counting
-        description: Ask if they want to try counting
-      - if: slots.wants_counting in ["yes", "yeah", "ok", "fine", "I guess"]
-        then:
-          - action: utter_count_together
-          - collect: counting_feeling
-            description: Check how they feel after counting
-          - action: utter_normalize_feeling
-          - action: utter_check_final_feeling
-          - collect: final_emotional_state
-            description: Final emotional check
-          - action: utter_praise_progress
+              - action: utter_acknowledge_situation
+              - action: utter_validate_anger
+              - collect: wants_counting
+                description: Ask if they want to try counting
+                next:
+                  - if: slots.wants_counting in ["yes", "yeah", "ok", "fine", "I guess"]
+                    then:
+                      - action: utter_count_together
+                      - collect: counting_feeling
+                        description: Check how they feel after counting
+                      - action: utter_normalize_feeling
+                      - action: utter_check_final_feeling
+                      - collect: final_emotional_state
+                        description: Final emotional check
+                      - action: utter_praise_progress
+                  - else:
+                      - action: utter_offer_help
 
-  # Path 2: Friend Issue - Annoyed to Okay
   friend_issue_flow:
     description: Handle friend disappointment with communication strategy
     steps:
@@ -38,20 +39,22 @@ flows:
               - action: utter_greet_annoyed
               - collect: trigger_situation
                 description: Ask what's bothering them
-      - action: utter_acknowledge_friend_situation
-      - action: utter_validate_frustration
-      - collect: wants_communication
-        description: Ask if they want to try communication
-      - if: slots.wants_communication in ["yes", "yeah", "ok", "maybe", "I guess"]
-        then:
-          - action: utter_suggest_communication
-          - action: utter_acknowledge_willingness
-          - action: utter_check_final_feeling
-          - collect: final_emotional_state
-            description: Final emotional check
-          - action: utter_celebrate_improvement
+              - action: utter_acknowledge_friend_situation
+              - action: utter_validate_frustration
+              - collect: wants_communication
+                description: Ask if they want to try communication
+                next:
+                  - if: slots.wants_communication in ["yes", "yeah", "ok", "maybe", "I guess"]
+                    then:
+                      - action: utter_suggest_communication
+                      - action: utter_acknowledge_willingness
+                      - action: utter_check_final_feeling
+                      - collect: final_emotional_state
+                        description: Final emotional check
+                      - action: utter_celebrate_improvement
+                  - else:
+                      - action: utter_offer_help
 
-  # Path 3: General Support Flow
   general_support_flow:
     description: Simple support flow for any emotion
     steps:
