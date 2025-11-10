@@ -43,6 +43,16 @@ slots:
       - type: from_llm
 
 responses:
+  utter_greet:
+    - text: "Hi there! I'm here to help you talk about your feelings."
+    - text: "Hello! How can I help today?"
+  utter_bye:
+    - text: "Goodbye! Take care."
+  utter_clarify_or_empathize:
+    - text: "I didn't understand that. Could you tell me more?"
+    - text: "Sorry it didn't help yet. Want to talk more about it or try something else?"
+    - text: "That sounds tough. Tell me more if you want."
+
   utter_ask_emotional_state:
     - text: "How are you feeling right now? Can you pick 'really mad', 'a bit annoyed', or 'okay'?"
   utter_ask_mad_reason:
@@ -63,15 +73,15 @@ responses:
     - text: "Nice work! You went from really mad to calmer. Well done."
 
   utter_ask_annoyed_reason:
-    - text: "What made you feel annoyed?"
+    - text: "What made you feel annoyed or sad?"
   utter_acknowledge_annoyed:
-    - text: "I get why that's annoying."
+    - text: "I get why that's annoying or upsetting."
   utter_ask_wants_solution:
-    - text: "Want to try a solution?"
+    - text: "Want to try a solution? Or do you just want to talk about it?"
   utter_suggest_solution:
-    - text: "You could send your friend a quick check-in message."
+    - text: "You could talk to your friend or tell someone how you feel."
   utter_ask_final_annoyance:
-    - text: "How annoyed are you feeling now?"
+    - text: "How annoyed or sad are you feeling now?"
   utter_praise_annoyed_progress:
     - text: "You handled being annoyed well. Good job."
 
