@@ -5,11 +5,7 @@ slots:
     type: text
     mappings:
       - type: from_llm
-  trigger_situation:
-    type: text
-    mappings:
-      - type: from_llm
-  final_emotional_state:
+  mad_reason:
     type: text
     mappings:
       - type: from_llm
@@ -21,98 +17,64 @@ slots:
     type: text
     mappings:
       - type: from_llm
-  wants_communication:
+  final_madness:
     type: text
     mappings:
       - type: from_llm
-  help_preference:
+  annoyed_reason:
+    type: text
+    mappings:
+      - type: from_llm
+  wants_solution:
+    type: text
+    mappings:
+      - type: from_llm
+  final_annoyance:
+    type: text
+    mappings:
+      - type: from_llm
+  guardian_request:
+    type: text
+    mappings:
+      - type: from_llm
+  guardian_wants_advice:
     type: text
     mappings:
       - type: from_llm
 
 responses:
-  utter_ask_emotional_state:
-    - text: "How are you feeling right now? You can pick 'really mad', 'a bit annoyed', or 'okay'"
-
-  utter_ask_trigger_situation:
-    - text: "What happened? Tell me in a few words"
-
-  utter_ask_final_emotional_state:
-    - text: "How are you feeling now after we tried that?"
-
-  utter_ask_wants_counting:
-    - text: "Would you like to try counting to calm down?"
-
-  utter_ask_counting_feeling:
-    - text: "How do you feel after counting?"
-
-  utter_ask_wants_communication:
-    - text: "Would you like to try talking to them about it?"
-
-  utter_ask_help_preference:
-    - text: "What would help you right now? Counting, talking about it, or something else?"
-
-  utter_greet_angry:
-    - text: "I can see you're feeling really angry right now. What happened?"
-
-  utter_greet_annoyed:
-    - text: "I see you're feeling a bit annoyed. What's bugging you today?"
-
-  utter_acknowledge_situation:
-    - text: "Sounds like that was really frustrating. Brothers can be annoying sometimes."
-
-  utter_validate_anger:
-    - text: "I get that you're upset. Getting super angry won't fix it though. Want to try something that might help you feel calmer?"
-
-  utter_count_together:
-    - text: "Alright, let's count together... 1... 2... 3... How's that feeling?"
-
+  utter_ask_mad_reason:
+    - text: "What made you really mad?"
+  utter_acknowledge_anger:
+    - text: "That sounds really frustrating."
+  utter_do_counting:
+    - text: "Let's try counting together: 1... 2... 3..."
   utter_normalize_feeling:
-    - text: "That's totally normal. At least you're not as heated as before."
+    - text: "Feeling a bit calmer is normal after counting."
+  utter_ask_final_madness:
+    - text: "How mad are you feeling now?"
+  utter_praise_emotion_change:
+    - text: "Nice work! You went from really mad to calmer. Well done."
 
-  utter_praise_progress:
-    - text: "Nice work! You went from really mad to calmer. That's actually pretty good."
+  utter_ask_annoyed_reason:
+    - text: "What made you feel annoyed?"
+  utter_acknowledge_annoyed:
+    - text: "I get why that's annoying."
+  utter_ask_wants_solution:
+    - text: "Want to try a solution?"
+  utter_suggest_solution:
+    - text: "You could send your friend a quick check-in message."
+  utter_ask_final_annoyance:
+    - text: "How annoyed are you feeling now?"
 
-  utter_acknowledge_friend_situation:
-    - text: "That sounds disappointing when someone doesn't follow through."
+  utter_praise_annoyed_progress:
+    - text: "You handled being annoyed well. Good job."
 
-  utter_validate_frustration:
-    - text: "I get why that would be frustrating. Sometimes people get busy and forget though."
-
-  utter_suggest_communication:
-    - text: "You could send her a quick message like 'Hey, just checking in'. That way you'll know if she's just busy or if something else is going on."
-
-  utter_acknowledge_willingness:
-    - text: "That sounds like a good plan. Sometimes the simple approach works best."
-
-  utter_check_final_feeling:
-    - text: "How are you feeling now about the whole situation?"
-
-  utter_celebrate_improvement:
-    - text: "Nice! That's pretty good problem-solving."
-
-  utter_general_acknowledgment:
-    - text: "I hear you. That sounds tough."
-
-  utter_offer_help:
-    - text: "Let's figure out what might help you feel better."
-
-  utter_provide_strategy:
-    - text: "That's a good approach. Give it a try and see how it goes."
-
-  utter_general_praise:
-    - text: "Good job working through that with me. You're doing great."
-
-  utter_free_chitchat_response:
-    - text: "placeholder"
-      metadata:
-        rephrase: True
-        rephrase_prompt: |
-          The following is a conversation with an AI assistant built with Rasa for emotion regulation.
-          The assistant helps children aged 10-14 manage their anger and emotions.
-          The assistant is caring, supportive, patient, and uses child-friendly language.
-          The user might be sharing feelings or making small talk.
-          Context / previous conversation with the user:
-          {{history}}
-          {{current_input}}
-          Suggested AI Response:
+  utter_ask_guardian_request:
+    - text: "What would you like to know about your child's anger?"
+  utter_report_guardian:
+    - text: "Your child gets angry mainly about sibling conflicts, twice a week."
+  utter_give_guardian_advice:
+    - text: "Try setting clear rules for borrowing things, and praise calming down."
+  utter_guardian_followup:
+    - text: "Let me know if you want more advice."
