@@ -43,8 +43,14 @@ slots:
       - type: from_llm
 
 responses:
+  utter_ask_emotional_state:
+    - text: "How are you feeling right now? Can you pick 'really mad', 'a bit annoyed', or 'okay'?"
   utter_ask_mad_reason:
     - text: "What made you really mad?"
+  utter_ask_wants_counting:
+    - text: "Would you like to try counting to calm down?"
+  utter_ask_counting_feeling:
+    - text: "How do you feel after counting?"
   utter_acknowledge_anger:
     - text: "That sounds really frustrating."
   utter_do_counting:
@@ -66,7 +72,6 @@ responses:
     - text: "You could send your friend a quick check-in message."
   utter_ask_final_annoyance:
     - text: "How annoyed are you feeling now?"
-
   utter_praise_annoyed_progress:
     - text: "You handled being annoyed well. Good job."
 
@@ -74,6 +79,8 @@ responses:
     - text: "What would you like to know about your child's anger?"
   utter_report_guardian:
     - text: "Your child gets angry mainly about sibling conflicts, twice a week."
+  utter_ask_guardian_wants_advice:
+    - text: "Is there anything else you'd like advice on?"
   utter_give_guardian_advice:
     - text: "Try setting clear rules for borrowing things, and praise calming down."
   utter_guardian_followup:
