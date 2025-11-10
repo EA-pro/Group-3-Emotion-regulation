@@ -1,9 +1,10 @@
 patterns:
-  - id: greetings
-    description: Handles greetings, goodbyes, simple chitchat (hi, hello, how are you, bye, etc.)
+  - id: greeting_pattern
+    description: Top-priority greeting and chit-chat handler for "hello", "hi", "hey", "how are you", "good morning", "evening", "greetings", "yo", and any similar word/phrase
     steps:
+      - collect: user_greeting
+        description: LLM, extract if user opened with a greeting or small talk. Accept: hello, hi, how are you, etc.
+        rejections:
+          - if: not slots.user_greeting
+            utter: utter_clarify_greeting
       - action: utter_greet
-  - id: fallback_acknowledge
-    description: Handles unclear or negative user feedback with a clarifying or empathetic response
-    steps:
-      - action: utter_clarify_or_empathize
