@@ -1,27 +1,11 @@
 version: "3.1"
 
 slots:
-  emotional_state:
+  user_emotion:
     type: text
     mappings:
       - type: from_llm
-  mad_reason:
-    type: text
-    mappings:
-      - type: from_llm
-  wants_counting:
-    type: text
-    mappings:
-      - type: from_llm
-  counting_feeling:
-    type: text
-    mappings:
-      - type: from_llm
-  final_madness:
-    type: text
-    mappings:
-      - type: from_llm
-  annoyed_reason:
+  situation_detail:
     type: text
     mappings:
       - type: from_llm
@@ -29,69 +13,31 @@ slots:
     type: text
     mappings:
       - type: from_llm
-  final_annoyance:
-    type: text
-    mappings:
-      - type: from_llm
-  guardian_request:
-    type: text
-    mappings:
-      - type: from_llm
-  guardian_wants_advice:
+  effect_of_solution:
     type: text
     mappings:
       - type: from_llm
 
 responses:
-  utter_greet:
-    - text: "Hi there! I'm here to help you talk about your feelings."
-    - text: "Hello! How can I help today?"
-  utter_bye:
-    - text: "Goodbye! Take care."
-  utter_clarify_or_empathize:
-    - text: "I didn't understand that. Could you tell me more?"
-    - text: "Sorry it didn't help yet. Want to talk more about it or try something else?"
-    - text: "That sounds tough. Tell me more if you want."
-
-  utter_ask_emotional_state:
-    - text: "How are you feeling right now? Can you pick 'really mad', 'a bit annoyed', or 'okay'?"
-  utter_ask_mad_reason:
-    - text: "What made you really mad?"
-  utter_ask_wants_counting:
-    - text: "Would you like to try counting to calm down?"
-  utter_ask_counting_feeling:
-    - text: "How do you feel after counting?"
-  utter_acknowledge_anger:
-    - text: "That sounds really frustrating."
-  utter_do_counting:
-    - text: "Let's try counting together: 1... 2... 3..."
-  utter_normalize_feeling:
-    - text: "Feeling a bit calmer is normal after counting."
-  utter_ask_final_madness:
-    - text: "How mad are you feeling now?"
-  utter_praise_emotion_change:
-    - text: "Nice work! You went from really mad to calmer. Well done."
-
-  utter_ask_annoyed_reason:
-    - text: "What made you feel annoyed or sad?"
-  utter_acknowledge_annoyed:
-    - text: "I get why that's annoying or upsetting."
+  utter_ask_user_emotion:
+    - text: "How are you feeling right now? You can say anything like sad, angry, lonely, etc."
+  utter_clarify_emotion:
+    - text: "I want to understand how you're really feeling. Can you say it another way?"
+  utter_ask_situation_detail:
+    - text: "Can you tell me what happened or what's bothering you?"
+  utter_clarify_situation:
+    - text: "Can you tell me a little more about what's happened or who it involved?"
+  utter_acknowledge_situation:
+    - text: "I get that. That must be hard."
   utter_ask_wants_solution:
-    - text: "Want to try a solution? Or do you just want to talk about it?"
-  utter_suggest_solution:
-    - text: "You could talk to your friend or tell someone how you feel."
-  utter_ask_final_annoyance:
-    - text: "How annoyed or sad are you feeling now?"
-  utter_praise_annoyed_progress:
-    - text: "You handled being annoyed well. Good job."
-
-  utter_ask_guardian_request:
-    - text: "What would you like to know about your child's anger?"
-  utter_report_guardian:
-    - text: "Your child gets angry mainly about sibling conflicts, twice a week."
-  utter_ask_guardian_wants_advice:
-    - text: "Is there anything else you'd like advice on?"
-  utter_give_guardian_advice:
-    - text: "Try setting clear rules for borrowing things, and praise calming down."
-  utter_guardian_followup:
-    - text: "Let me know if you want more advice."
+    - text: "Would you like help or advice for this, or do you just want to talk about it?"
+  utter_clarify_help:
+    - text: "Do you want to try a solution, or would it help just to talk? It's okay to just share."
+  utter_suggest_coping_if_wanted:
+    - text: "Would you like to try something that sometimes helps? Or we can talk more if you prefer."
+  utter_ask_effect_of_solution:
+    - text: "Did that help at all, or do you still feel the same? If not, what should we try next?"
+  utter_clarify_effect:
+    - text: "Tell me how you feel now, or if you want to try something else."
+  utter_next_steps_or_empathy:
+    - text: "We can keep talking, or try something different if you want. Let me know what you'd like."
