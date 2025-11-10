@@ -3,51 +3,74 @@ flows:
     description: Child says "really mad" and chatbot guides counting and reflection
     steps:
       - action: utter_greet_mad
+        next: END
       - collect: mad_reason
         description: Ask what happened
+        next: END
       - action: utter_acknowledge_mad_reason
+        next: END
       - collect: wants_counting
         description: Ask if child wants to count
         next:
           - if: slots.wants_counting in ["yes", "ok", "I guess", "fine"]
             then:
               - action: utter_do_counting
+                next: END
               - collect: counting_feeling
                 description: How do you feel now?
+                next: END
               - action: utter_reflect_mad_progress
+                next: END
               - collect: final_mad_level
                 description: Are you still really mad?
+                next: END
               - action: utter_praise_mad_progress
+                next: END
           - else:
               - action: utter_encourage_alternative
+                next: END
 
   annoyed_path:
     description: Child says "a bit annoyed" and chatbot offers reframing and solution
     steps:
       - action: utter_greet_annoyed
+        next: END
       - collect: annoyed_reason
         description: Ask what's bugging them
+        next: END
       - action: utter_acknowledge_annoyed_reason
+        next: END
       - collect: wants_solution
         description: Want to try a solution or message friend?
         next:
           - if: slots.wants_solution in ["yes", "maybe", "ok"]
             then:
               - action: utter_suggest_simple_solution
+                next: END
               - action: utter_acknowledge_success
+                next: END
               - collect: final_annoyance_level
                 description: Still annoyed?
+                next: END
               - action: utter_praise_annoyed_progress
+                next: END
           - else:
               - action: utter_encourage_alternative
+                next: END
 
   guardian_report_path:
     description: Guardian asks for child's anger update and advice
     steps:
       - action: utter_greet_guardian
+        next: END
       - action: utter_report_child_anger
+        next: END
       - collect: guardian_wants_advice
         description: Anything else guardian wants to know?
+        next: END
       - action: utter_give_guardian_advice
+        next: END
       - action: utter_report_progress
+        next: END
       - action: utter_guardian_final_tips
+        next: END
