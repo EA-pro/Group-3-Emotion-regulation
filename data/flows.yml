@@ -1,76 +1,51 @@
 flows:
-  mad_path:
-    description: Child says "really mad" and chatbot guides counting and reflection
+  mad_happy_path:
+    description: Child is really mad and chat support guides emotional regulation via counting
     steps:
-      - action: utter_greet_mad
-        next: END
+      - action: utter_greet_angry
       - collect: mad_reason
-        description: Ask what happened
-        next: END
-      - action: utter_acknowledge_mad_reason
-        next: END
+        description: Reason for being really mad
+      - action: utter_acknowledge_anger
       - collect: wants_counting
-        description: Ask if child wants to count
+        description: Would you like to try counting?
         next:
-          - if: slots.wants_counting in ["yes", "ok", "I guess", "fine"]
+          - if: slots.wants_counting in ["yes", "yeah", "ok", "fine", "I guess"]
             then:
-              - action: utter_do_counting
-                next: END
+              - action: utter_start_counting
               - collect: counting_feeling
-                description: How do you feel now?
-                next: END
-              - action: utter_reflect_mad_progress
-                next: END
-              - collect: final_mad_level
+                description: How does that feel now?
+              - action: utter_reframe_anger
+              - collect: final_madness
                 description: Are you still really mad?
-                next: END
-              - action: utter_praise_mad_progress
-                next: END
+              - action: utter_praise_emotion_change
+            # If user doesn't want counting
           - else:
               - action: utter_encourage_alternative
-                next: END
-
-  annoyed_path:
-    description: Child says "a bit annoyed" and chatbot offers reframing and solution
+  annoyed_happy_path:
+    description: Child is a bit annoyed and bot guides reframing and easy solution
     steps:
       - action: utter_greet_annoyed
-        next: END
       - collect: annoyed_reason
-        description: Ask what's bugging them
-        next: END
-      - action: utter_acknowledge_annoyed_reason
-        next: END
+        description: What's bugging you?
+      - action: utter_acknowledge_annoyed
       - collect: wants_solution
-        description: Want to try a solution or message friend?
+        description: Would you like a suggestion/solution?
         next:
           - if: slots.wants_solution in ["yes", "maybe", "ok"]
             then:
-              - action: utter_suggest_simple_solution
-                next: END
+              - action: utter_suggest_solution
               - action: utter_acknowledge_success
-                next: END
-              - collect: final_annoyance_level
-                description: Still annoyed?
-                next: END
-              - action: utter_praise_annoyed_progress
-                next: END
+              - collect: final_annoyance
+                description: Are you still annoyed?
+              - action: utter_praise_emotion_change
           - else:
               - action: utter_encourage_alternative
-                next: END
-
-  guardian_report_path:
-    description: Guardian asks for child's anger update and advice
+  guardian_happy_path:
+    description: Guardian requests update and advice about child's anger
     steps:
       - action: utter_greet_guardian
-        next: END
-      - action: utter_report_child_anger
-        next: END
+      - action: utter_report_guardian
       - collect: guardian_wants_advice
-        description: Anything else guardian wants to know?
-        next: END
+        description: What do you want to know?
       - action: utter_give_guardian_advice
-        next: END
-      - action: utter_report_progress
-        next: END
-      - action: utter_guardian_final_tips
-        next: END
+      - action: utter_guardian_followup
