@@ -1,27 +1,27 @@
 flows:
   emotion_main_flow:
-    description: Conversational support for any emotion/situation, with high-fidelity slot extraction and explicit listening turns
+    description: Conversational support for ANY emotion/situation, child audience, broad LLM slot extraction, clarification if uncertain, always one collect per turn.
     steps:
       - collect: user_emotion
-        description: LLM, extract main feeling (sad/angry/hurt/afraid/confused/embarrassed/lonely/left out/ignored/other emotion); don't interpret, just extract
+        description: LLM, extract main feeling (sad, mad, afraid, hurt, jealous, embarrassed, lonely, ignored, left out, bored, worried, disappointed, scared, upset, angry, happy, or any emotion); do not interpret, just extract
         rejections:
-          - condition: not slots.user_emotion
-            response: utter_clarify_emotion
+          - if: not slots.user_emotion
+            utter: utter_clarify_emotion
       - collect: situation_detail
-        description: LLM, summarize the key event or trigger described (e.g. sibling did something, friend didn’t text, physical aggression, words, accident, etc.); extract as much detail as user shared
+        description: LLM, summarize what happened in as much detail as user provides (e.g. another person, specific event, any trigger); allow for diverse, open-ended answers
         rejections:
-          - condition: not slots.situation_detail
-            response: utter_clarify_situation
+          - if: not slots.situation_detail
+            utter: utter_clarify_situation
       - action: utter_acknowledge_situation
       - collect: wants_solution
-        description: LLM, did user ask for help or just want to vent? Extract Yes/No/Unclear
+        description: LLM, does user want advice/solution/help or just to vent? Yes/No/Don't Know allowed. Be child-friendly, tolerant of complex answers.
         rejections:
-          - condition: slots.wants_solution == "Unclear"
-            response: utter_clarify_help
+          - if: not slots.wants_solution
+            utter: utter_clarify_help
       - action: utter_suggest_coping_if_wanted
       - collect: effect_of_solution
-        description: LLM, how did user respond? Did it help? Did user say still sad, mad, or it didn't work?
+        description: LLM, after suggestion/check-in, did user feel better, worse, or unchanged? Support all honest answers, don't assume positive result
         rejections:
-          - condition: not slots.effect_of_solution
-            response: utter_clarify_effect
+          - if: not slots.effect_of_solution
+            utter: utter_clarify_effect
       - action: utter_next_steps_or_empathy
