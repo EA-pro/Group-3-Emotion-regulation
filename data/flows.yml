@@ -1,44 +1,27 @@
 flows:
-  mad_happy_path:
-    description: Child is really mad and chat support guides emotional regulation via counting
+  emotion_main_flow:
+    description: Conversational support for any emotion/situation, with high-fidelity slot extraction and explicit listening turns
     steps:
-      - collect: emotional_state
-        description: Select emotional state (e.g. really mad)
-      - collect: mad_reason
-        description: Reason for being really mad
-      - action: utter_acknowledge_anger
-      - collect: wants_counting
-        description: Would you like to try counting?
-      - action: utter_do_counting
-      - collect: counting_feeling
-        description: How do you feel after counting?
-      - action: utter_normalize_feeling
-      - collect: final_madness
-        description: Are you still really mad?
-      - action: utter_praise_emotion_change
-
-  annoyed_happy_path:
-    description: Child is a bit annoyed and bot guides reframing and easy solution
-    steps:
-      - collect: emotional_state
-        description: Select emotional state (e.g. a bit annoyed)
-      - collect: annoyed_reason
-        description: What's bugging you?
-      - action: utter_acknowledge_annoyed
+      - collect: user_emotion
+        description: LLM, extract main feeling (sad/angry/hurt/afraid/confused/embarrassed/lonely/left out/ignored/other emotion); don't interpret, just extract
+        rejections:
+          - condition: not slots.user_emotion
+            response: utter_clarify_emotion
+      - collect: situation_detail
+        description: LLM, summarize the key event or trigger described (e.g. sibling did something, friend didn’t text, physical aggression, words, accident, etc.); extract as much detail as user shared
+        rejections:
+          - condition: not slots.situation_detail
+            response: utter_clarify_situation
+      - action: utter_acknowledge_situation
       - collect: wants_solution
-        description: Would you like a suggestion or solution?
-      - action: utter_suggest_solution
-      - collect: final_annoyance
-        description: Are you still annoyed?
-      - action: utter_praise_emotion_change
-
-  guardian_happy_path:
-    description: Guardian requests update and advice about child's anger
-    steps:
-      - collect: guardian_request
-        description: Guardian asks for update
-      - action: utter_report_guardian
-      - collect: guardian_wants_advice
-        description: What do you want to know?
-      - action: utter_give_guardian_advice
-      - action: utter_guardian_followup
+        description: LLM, did user ask for help or just want to vent? Extract Yes/No/Unclear
+        rejections:
+          - condition: slots.wants_solution == "Unclear"
+            response: utter_clarify_help
+      - action: utter_suggest_coping_if_wanted
+      - collect: effect_of_solution
+        description: LLM, how did user respond? Did it help? Did user say still sad, mad, or it didn't work?
+        rejections:
+          - condition: not slots.effect_of_solution
+            response: utter_clarify_effect
+      - action: utter_next_steps_or_empathy
