@@ -1,6 +1,7 @@
 flows:
   emotion_main_flow:
     description: Conversational support for ANY emotion/situation, child audience, broad LLM slot extraction, clarification if uncertain, always one collect per turn.
+    run_pattern_completed: false
     steps:
       - collect: user_emotion
         description: LLM, extract main feeling (sad, mad, afraid, hurt, jealous, embarrassed, lonely, ignored, left out, bored, worried, disappointed, scared, upset, angry, happy, or any emotion); do not interpret, just extract
