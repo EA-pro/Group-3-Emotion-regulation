@@ -53,18 +53,3 @@ model_groups:
       - provider: rasa
         model: rasa/command-generator-llama-3.1-8b-instruct
         api_base: "https://tutorial-llm.rasa.ai"
-
-# Added CORS configuration to allow all origins
-cors:
-  origins:
-    - "*"
-  methods:
-    - GET
-    - POST
-    - PUT
-    - OPTIONS
-  headers:
-    - Content-Type
-    - Authorization
-
-    

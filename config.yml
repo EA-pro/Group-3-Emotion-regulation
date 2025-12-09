@@ -1,13 +1,14 @@
 recipe: default.v1
 language: en
+assistant_id: coffee-bulwark
+
 pipeline:
-- name: CompactLLMCommandGenerator
-  llm:
-    model_group: rasa_command_generation_model
-  flow_retrieval:
-    active: false
+  - name: NLUCommandAdapter
+  - name: CompactLLMCommandGenerator
+    llm:
+      model_group: rasa_command_generation_model
+    flow_retrieval:
+      active: false
 
 policies:
-- name: FlowPolicy
-#  - name: EnterpriseSearchPolicy
-assistant_id: 20250827-154803-coal-resin
+  - name: FlowPolicy

@@ -1,53 +1,164 @@
 version: "3.1"
 
+intents:
+  - greet
+  - mood_select
+  - mood_happy
+  - mood_sad
+  - mood_angry
+  - affirm
+  - deny
+  - pick_reason
+  - check_mood
+
+entities:
+  - mood
+  - affirmation
+  - denial
+  - reason
+
 slots:
-  user_greeting:
+  mood:
     type: text
+    influence_conversation: true
     mappings:
-      - type: from_llm
-  user_emotion:
+      - type: from_entity
+        entity: mood
+      - type: from_text
+        intent: mood_select
+      - type: from_intent
+        intent: mood_happy
+        value: happy
+      - type: from_intent
+        intent: mood_sad
+        value: sad
+      - type: from_intent
+        intent: mood_angry
+        value: angry
+
+  reason:
     type: text
+    influence_conversation: false
     mappings:
-      - type: from_llm
-  situation_detail:
+      - type: from_entity
+        entity: reason
+
+  support_stage:
     type: text
-    mappings:
-      - type: from_llm
-  wants_solution:
+    influence_conversation: false
+
+  last_mood:
     type: text
-    mappings:
-      - type: from_llm
-  effect_of_solution:
-    type: text
-    mappings:
-      - type: from_llm
+    influence_conversation: false
 
 responses:
-  utter_greet:
-    - text: "Hi there! I'm here to listen. How are you feeling today?"
-    - text: "Hello! What would you like to talk about?"
-    - text: "Hey! You can tell me what's on your mind."
-  utter_clarify_greeting:
-    - text: "If you want to say hi, just type 'hello', 'hi', or anything you'd like."
-  utter_ask_user_emotion:
-    - text: "How are you feeling right now? You can say anything like sad, angry, lonely, etc."
-  utter_clarify_emotion:
-    - text: "I want to understand how you're really feeling. Can you say it another way?"
-  utter_ask_situation_detail:
-    - text: "Can you tell me what happened or what's bothering you?"
-  utter_clarify_situation:
-    - text: "Can you tell me a little more about what's happened or who it involved?"
-  utter_acknowledge_situation:
-    - text: "I get that. That must be hard."
-  utter_ask_wants_solution:
-    - text: "Would you like help or advice for this, or do you just want to talk about it?"
-  utter_clarify_help:
-    - text: "Do you want to try a solution, or would it help just to talk? It's okay to just share."
-  utter_suggest_coping_if_wanted:
-    - text: "Would you like to try something that sometimes helps? Or we can talk more if you prefer."
-  utter_ask_effect_of_solution:
-    - text: "Did that help at all, or do you still feel the same? If not, what should we try next?"
-  utter_clarify_effect:
-    - text: "Tell me how you feel now, or if you want to try something else."
-  utter_next_steps_or_empathy:
-    - text: "We can keep talking, or try something different if you want. Let me know what you'd like."
+  utter_ask_mood_intro:
+    - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
+      buttons:
+        - title: "😡 Angry"
+          payload: '/mood_angry{"mood":"angry"}'
+        - title: "😕 Sad"
+          payload: '/mood_sad{"mood":"sad"}'
+        - title: "😊 Happy"
+          payload: '/mood_happy{"mood":"happy"}'
+
+  utter_supportive_message:
+    - text: "Hey there! I can help you understand your feelings and think of gentle ways to calm down, but I can’t replace a real person you trust. You’re not alone, let’s take it one step at a time together. 💛"
+
+  utter_ask_mood:
+    - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
+
+  utter_reflect_mood_happy:
+    - text: "Yay, you’re feeling happy! 😊 That makes me smile too. And if you ever have a tough moment or feel upset, you can always come back to me. I’m here for you, every single time."
+
+  utter_reflect_mood_sad:
+    - text: "It’s okay to feel sad. 💙 Thank you for trusting me and telling me. Sad feelings can feel heavy, but you’re not alone, we can take this slowly together."
+
+  utter_reflect_mood_angry:
+    - text: "It sounds like you're feeling really angry right now. 😠 That's okay, big feelings can be tough to hold. I'm right here with you, and we can take some calm steps together to help your body settle down."
+
+  utter_reason_why_you_feel_upset_question:
+    - text: "Let's slow down for a moment. 💛 Do you know what made you feel upset?"
+      buttons:
+        - title: "Yes"
+          payload: '/affirm{"affirmation":"yes"}'
+        - title: "No"
+          payload: '/deny{"denial":"no"}'
+
+  utter_acknowledge_uneasy_feeling:
+    - text: "That’s completely okay. 💛 Sometimes our heart feels a bit heavy even if we don’t really know why."
+
+  utter_overview_common_reasons_sad:
+    - text: "Here are some common reasons children might feel sad:" 
+      buttons:
+        - title: "I'm tired"
+          payload: '/pick_reason{"reason":"tired"}'
+        - title: "I miss someone"
+          payload: '/pick_reason{"reason":"missing_someone"}'
+        - title: "Something changed at home"
+          payload: '/pick_reason{"reason":"change_in_routine"}'
+        - title: "Worried about school"
+          payload: '/pick_reason{"reason":"worry_school"}'
+        - title: "I don't know"
+          payload: '/pick_reason{"reason":"dont_know"}'
+        # Note: removed "Continue without picking a reason" option as requested
+
+  utter_overview_common_reasons_angry:
+    - text: "Here are some common reasons children might feel angry:"
+      buttons:
+        - title: "I feel frustrated"
+          payload: '/pick_reason{"reason":"frustration"}'
+        - title: "Someone upset me"
+          payload: '/pick_reason{"reason":"someone_bothered_me"}'
+        - title: "I feel ignored"
+          payload: '/pick_reason{"reason":"feeling_ignored"}'
+        - title: "Loud/noisy environment"
+          payload: '/pick_reason{"reason":"overstimulation"}'
+        - title: "I don't know"
+          payload: '/pick_reason{"reason":"dont_know"}'
+        # Note: removed "Continue without picking a reason" option as requested
+
+  utter_ask_reason_after_affirm:
+    - text: "Great that you know why you are feeling {mood}. Which reason comes closest to why you are feeling this way?"
+
+  utter_can_do_something_else:
+    - text: "Thank you for sharing that with me. 🌿 If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
+
+  utter_reason_unknown_exercise:
+    - text: "It’s completely okay not to know. 💛 Let’s give your heart and body a moment to settle. How about a tiny calm break and take a slow sip of water."
+
+  utter_reason_unknown_ask_later: 
+    - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
+
+  utter_stage_common_ground:
+    - text: "You chose this emotion, and that was really good. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below."
+
+  utter_stage_acceptance:
+    - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
+
+  utter_stage_analysis:
+    - text: "Sometimes noticing small details can help. We can look together for one small thing that might have made this stronger. Would you like to continue to the next step?"
+
+  utter_stage_nuance:
+    - text: "One small reframe might help make the feeling a bit lighter. No pressure — it's just a gentle way to think about things differently. Shall we give it a try?"
+
+  utter_stage_continue_question:
+    - text: "Would you like to continue?"
+      buttons:
+        - title: "Yes"
+          payload: '/affirm{"affirmation":"yes"}'
+        - title: "Not right now"
+          payload: '/deny{"denial":"no"}'
+
+  utter_support_done:
+    - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."
+
+  utter_divider:
+    - text: "──────────"
+ 
+actions:
+  - action_start_reflect_flow
+  - action_handle_reason_response
+  - action_handle_pick_reason
+  - action_handle_support_flow
+  - action_get_stored_mood
