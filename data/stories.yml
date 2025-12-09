@@ -1,0 +1,117 @@
+version: "3.1"
+
+stories:
+
+- story: mood happy via button
+  steps:
+  - intent: mood_happy
+  - slot_was_set:
+    - mood: happy
+  - action: action_start_reflect_flow
+
+- story: mood sad via button
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+
+- story: mood angry via button
+  steps:
+  - intent: mood_angry
+  - slot_was_set:
+    - mood: angry
+  - action: action_start_reflect_flow
+
+- story: mood sad -> know reason? no
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: deny
+  - action: action_handle_reason_response
+  - action: utter_acknowledge_uneasy_feeling
+  - action: utter_overview_common_reasons_sad
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"dont_know"}
+  - action: action_handle_pick_reason
+  - action: utter_reason_unknown_exercise
+  - action: utter_reason_unknown_ask_later
+  # End flow when user chooses 'I don't know' (no support flow triggered automatically)
+
+- story: mood angry -> know reason? no
+  steps:
+  - intent: mood_angry
+  - slot_was_set:
+    - mood: angry
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: deny
+  - action: action_handle_reason_response
+  - action: utter_acknowledge_uneasy_feeling
+  - action: utter_overview_common_reasons_angry
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"dont_know"}
+  - action: action_handle_pick_reason
+  - action: utter_reason_unknown_exercise
+  - action: utter_reason_unknown_ask_later
+  # End flow when user chooses 'I don't know' (no support flow triggered automatically)
+
+- story: mood angry -> know reason? yes -> pick reason
+  steps:
+  - intent: mood_angry
+  - slot_was_set:
+    - mood: angry
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_reason_response
+  - action: utter_ask_reason_after_affirm
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"frustration"}
+  - action: action_handle_pick_reason
+  - action: utter_divider
+  - action: action_handle_support_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_support_flow
+
+- story: mood sad -> know reason? yes -> pick reason
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_reason_response
+  - action: utter_ask_reason_after_affirm
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"tired"}
+  - action: action_handle_pick_reason
+  - action: utter_divider
+  - action: action_handle_support_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_support_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_support_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_support_flow
+
+- story: query stored mood
+  steps:
+  - intent: check_mood
+  - action: action_get_stored_mood

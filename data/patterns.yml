@@ -1,24 +1,11 @@
-patterns:
-  - id: greeting_pattern
-    description: Top-priority greeting and chit-chat handler for "hello", "hi", "hey", "how are you", "good morning", "evening", "greetings", "yo", and any similar word/phrase
+flows:
+  pattern_chitchat:
+    description: Conversation repair flow for off-topic interactions that won't disrupt the main conversation. should not respond to greetings or anything else for which there is a flow defined
+    name: pattern chitchat
     steps:
-      - collect: user_greeting
-        description: LLM, extract if user opened with a greeting or small talk. Accept: hello, hi, how are you, etc.
-        rejections:
-          - if: not slots.user_greeting
-            utter: utter_clarify_greeting
-      - action: utter_greet
-
-utter_free_chitchat_response:
-  - text: "placeholder"
-    metadata:
-      rephrase: True
-      rephrase_prompt:
-        The following is a conversation with an AI assistant built with Rasa.
-        The assistant can respond in a kind way to calm a situation.
-        The assistant is helpful, kind, nurturing, understanding and very friendly.
-        The user is making small talk, or greeting the chatbot, or simply stating something about how they are feeling, and the assistant should respond, calming the situation if needed.
-        Context / previous converstation with the user:
-        {{history}}
-        {{current_input}}
-        Suggested AI Response:
+      - action: utter_free_chitchat_response
+  pattern_search:
+    description: Flow for handling knowledge-based questions
+    name: pattern search
+    steps:
+      - action: utter_free_chitchat_response

@@ -1,28 +1,57 @@
+version: "3.1"
+
 flows:
-  emotion_main_flow:
-    description: Conversational support for ANY emotion/situation, child audience, broad LLM slot extraction, clarification if uncertain, always one collect per turn.
-    run_pattern_completed: false
+
+  flow_greeting_and_selecting_current_emotional_state:
+    description: >
+      Emotional check-in flow for children. This flow is used when the child greets
+      the assistant and should be guided to choose an emoji that reflects their
+      current emotional state. The assistant then acknowledges and reflects the
+      selected feeling in a calm and supportive manner.
     steps:
-      - collect: user_emotion
-        description: LLM, extract main feeling (sad, mad, afraid, hurt, jealous, embarrassed, lonely, ignored, left out, bored, worried, disappointed, scared, upset, angry, happy, or any emotion); do not interpret, just extract
-        rejections:
-          - if: not slots.user_emotion
-            utter: utter_clarify_emotion
-      - collect: situation_detail
-        description: LLM, summarize what happened in as much detail as user provides (e.g. another person, specific event, any trigger); allow for diverse, open-ended answers
-        rejections:
-          - if: not slots.situation_detail
-            utter: utter_clarify_situation
-      - action: utter_acknowledge_situation
-      - collect: wants_solution
-        description: LLM, does user want advice/solution/help or just to vent? Yes/No/Don't Know allowed. Be child-friendly, tolerant of complex answers.
-        rejections:
-          - if: not slots.wants_solution
-            utter: utter_clarify_help
-      - action: utter_suggest_coping_if_wanted
-      - collect: effect_of_solution
-        description: LLM, after suggestion/check-in, did user feel better, worse, or unchanged? Support all honest answers, don't assume positive result
-        rejections:
-          - if: not slots.effect_of_solution
-            utter: utter_clarify_effect
-      - action: utter_next_steps_or_empathy
+      # Step 0) Reset mood slot at flow start
+      - set_slots:
+        - mood: null
+
+      # Step 1) Send supportive message first, then intro (with emoji buttons),
+      # then listen for the user's choice. Using `action_listen` lets the
+      # intent/rule mapping handle the button press directly and trigger the
+      # specific `utter_reflect_mood_<mood>` responses.
+      - action: utter_supportive_message
+      - action: utter_ask_mood_intro
+      - action: action_listen
+
+      # After the user selects a mood, trigger the custom action which will
+      # dispatch the appropriate reflection utterance based on the mood slot
+      - action: action_start_reflect_flow
+      - action: action_listen
+      # When user replies to the reason question, handle their Yes/No response
+      - action: action_handle_reason_response
+      - action: action_listen
+      # After the user sees the overview of common reasons, let them pick one
+      - action: action_handle_pick_reason
+      - action: action_listen
+
+  flow_reflect_happy:
+    description: >
+      Flow that runs after the user selects "happy" — shows the happy
+      reflection message and completes.
+    steps:
+      - action: utter_reflect_mood_happy
+      - action: action_listen
+
+  flow_reflect_sad:
+    description: >
+      Flow that runs after the user selects "sad" — shows the sad
+      reflection message and completes.
+    steps:
+      - action: utter_reflect_mood_sad
+      - action: action_listen
+
+  flow_reflect_angry:
+    description: >
+      Flow that runs after the user selects "angry" — shows the angry
+      reflection message and completes.
+    steps:
+      - action: utter_reflect_mood_angry
+      - action: action_listen

@@ -1,0 +1,84 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hi
+    - hello
+    - hey
+    - good morning
+    - good afternoon
+    - good evening
+
+- intent: mood_select
+  examples: |
+    - /mood_select{"mood":"happy"}
+    - /mood_select{"mood":"sad"}
+    - /mood_select{"mood":"angry"}
+
+- intent: mood_happy
+  examples: |
+    - I'm feeling happy
+    - I'm happy
+    - 😊
+    - happy
+    - Happy
+    - "😊 Happy"
+
+- intent: mood_sad
+  examples: |
+    - I'm sad
+    - feeling sad
+    - 😢
+    - sad
+    - Sad
+    - "😕 Sad"
+
+- intent: mood_angry
+  examples: |
+    - I'm angry
+    - that's making me angry
+    - 😡
+    - angry
+    - Angry
+    - "😡 Angry"
+
+- intent: restart
+  examples: |
+    - restart
+    - nieuw gesprek
+    - begin opnieuw
+    - start again
+
+- intent: affirm
+  examples: |
+    - yes
+    - yep
+    - absolutely
+    - indeed
+    - that's right
+
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - not at all
+    - never
+    - that's not right
+
+- intent: pick_reason
+  examples: |
+    - I don't know
+    - I'm not sure
+    - I don't really know
+    - I don't know why
+    - I miss someone
+    - I miss my family
+    - I'm tired
+
+- intent: check_mood
+  examples: |
+    - What was I feeling earlier?
+    - Do you remember how I was feeling?
+    - How did I say I felt?
+    - What did I tell you I felt?
