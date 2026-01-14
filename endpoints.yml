@@ -8,7 +8,7 @@ model_groups:
       - provider: gemini
         model: gemini-1.5-flash
         timeout: 30
-        api_key: "AIzaSyDCav3kRpQcK_oHdH_2JO4ckCAItcBp6DQ"
+        api_key: ${GEMINI_API_KEY}
         temperature: 0.0
 
   # 2) Response generation (Voor het antwoord op basis van je docs)
@@ -17,7 +17,7 @@ model_groups:
       - provider: gemini
         model: gemini-1.5-flash
         timeout: 30
-        api_key: "AIzaSyDCav3kRpQcK_oHdH_2JO4ckCAItcBp6DQ"
+        api_key: ${GEMINI_API_KEY}
         temperature: 0.0
 
   # 3) Embeddings model (Om de tekst in je docs om te zetten naar getallen)
@@ -26,4 +26,4 @@ model_groups:
       - provider: gemini
         model: text-embedding-004
         timeout: 30
-        api_key: "AIzaSyDCav3kRpQcK_oHdH_2JO4ckCAItcBp6DQ"
+        api_key: ${GEMINI_API_KEY}

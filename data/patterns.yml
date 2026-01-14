@@ -4,8 +4,3 @@ flows:
     name: pattern chitchat
     steps:
       - action: utter_free_chitchat_response
-  pattern_search:
-    description: Flow for handling knowledge-based questions
-    name: pattern search
-    steps:
-      - action: utter_free_chitchat_response
