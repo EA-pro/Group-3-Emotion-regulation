@@ -4,11 +4,22 @@ assistant_id: coffee-bulwark
 
 pipeline:
   - name: NLUCommandAdapter
-  - name: CompactLLMCommandGenerator
+  # Gebruik de SearchReady versie voor RAG support
+  - name: SearchReadyLLMCommandGenerator
     llm:
-      model_group: rasa_command_generation_model
+      model_group: gemini_command_generation_model
     flow_retrieval:
       active: false
 
 policies:
   - name: FlowPolicy
+  
+  # Voeg de Enterprise Search Policy toe
+  - name: EnterpriseSearchPolicy
+    llm:
+      model_group: gemini_search_generation_model
+    embeddings:
+      model_group: gemini_embeddings_model
+    vector_store:
+      type: "faiss"
+      source: "./docs"

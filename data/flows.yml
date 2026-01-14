@@ -55,3 +55,9 @@ flows:
     steps:
       - action: utter_reflect_mood_angry
       - action: action_listen
+  
+  pattern_search:
+    description: handle a knowledge-based question or request
+    name: pattern search
+    steps:
+      - action: action_trigger_search      
