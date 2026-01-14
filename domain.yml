@@ -53,14 +53,14 @@ slots:
 
 responses:
   utter_ask_mood_intro:
-    - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
-      buttons:
-        - title: "😡 Angry"
-          payload: '/mood_angry{"mood":"angry"}'
-        - title: "😕 Sad"
-          payload: '/mood_sad{"mood":"sad"}'
-        - title: "😊 Happy"
-          payload: '/mood_happy{"mood":"happy"}'
+  - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
+    buttons:
+      - title: "😡 Angry"
+        payload: "/mood_angry{\"mood\":\"angry\"}"
+      - title: "😕 Sad"
+        payload: "/mood_sad{\"mood\":\"sad\"}"
+      - title: "😊 Happy"
+        payload: "/mood_happy{\"mood\":\"happy\"}"
 
   utter_supportive_message:
     - text: "Hey there! I can help you understand your feelings and think of gentle ways to calm down, but I can’t replace a real person you trust. You’re not alone, let’s take it one step at a time together. 💛"

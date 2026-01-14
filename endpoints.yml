@@ -6,7 +6,7 @@ model_groups:
   - id: gemini_command_generation_model
     models:
       - provider: gemini
-        model: gemini-1.5-flash
+        model: gemini-flash-latest
         timeout: 30
         api_key: ${GEMINI_API_KEY}
         temperature: 0.0
@@ -15,7 +15,7 @@ model_groups:
   - id: gemini_search_generation_model
     models:
       - provider: gemini
-        model: gemini-1.5-flash
+        model: gemini-flash-latest
         timeout: 30
         api_key: ${GEMINI_API_KEY}
         temperature: 0.0
