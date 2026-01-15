@@ -23,4 +23,4 @@ policies:
     vector_store:
       type: "faiss"
       source: "./docs"
-  prompt_template: prompts/enterprise-search-policy-template.jinja2
+    prompt_template: prompts/enterprise-search-policy-template.jinja2
