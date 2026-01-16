@@ -56,11 +56,11 @@ responses:
   - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
     buttons:
       - title: "😡 Angry"
-        payload: "/mood_angry{\"mood\":\"angry\"}"
+        payload: "/mood_angry{{\"mood\":\"angry\"}}"
       - title: "😕 Sad"
-        payload: "/mood_sad{\"mood\":\"sad\"}"
+        payload: "/mood_sad{{\"mood\":\"sad\"}}"
       - title: "😊 Happy"
-        payload: "/mood_happy{\"mood\":\"happy\"}"
+        payload: "/mood_happy{{\"mood\":\"happy\"}}"
 
   utter_supportive_message:
     - text: "Hey there! I can help you understand your feelings and think of gentle ways to calm down, but I can’t replace a real person you trust. You’re not alone, let’s take it one step at a time together. 💛"
@@ -81,9 +81,9 @@ responses:
     - text: "Let's slow down for a moment. 💛 Do you know what made you feel upset?"
       buttons:
         - title: "Yes"
-          payload: '/affirm{"affirmation":"yes"}'
+          payload: '/affirm{{"affirmation":"yes"}}'
         - title: "No"
-          payload: '/deny{"denial":"no"}'
+          payload: '/deny{{"denial":"no"}}'
 
   utter_acknowledge_uneasy_feeling:
     - text: "That’s completely okay. 💛 Sometimes our heart feels a bit heavy even if we don’t really know why."
@@ -92,30 +92,30 @@ responses:
     - text: "Here are some common reasons children might feel sad:" 
       buttons:
         - title: "I'm tired"
-          payload: '/pick_reason{"reason":"tired"}'
+          payload: '/pick_reason{{"reason":"tired"}}'
         - title: "I miss someone"
-          payload: '/pick_reason{"reason":"missing_someone"}'
+          payload: '/pick_reason{{"reason":"missing_someone"}}'
         - title: "Something changed at home"
-          payload: '/pick_reason{"reason":"change_in_routine"}'
+          payload: '/pick_reason{{"reason":"change_in_routine"}}'
         - title: "Worried about school"
-          payload: '/pick_reason{"reason":"worry_school"}'
+          payload: '/pick_reason{{"reason":"worry_school"}}'
         - title: "I don't know"
-          payload: '/pick_reason{"reason":"dont_know"}'
+          payload: '/pick_reason{{"reason":"dont_know"}}'
         # Note: removed "Continue without picking a reason" option as requested
 
   utter_overview_common_reasons_angry:
     - text: "Here are some common reasons children might feel angry:"
       buttons:
         - title: "I feel frustrated"
-          payload: '/pick_reason{"reason":"frustration"}'
+          payload: '/pick_reason{{"reason":"frustration"}}'
         - title: "Someone upset me"
-          payload: '/pick_reason{"reason":"someone_bothered_me"}'
+          payload: '/pick_reason{{"reason":"someone_bothered_me"}}'
         - title: "I feel ignored"
-          payload: '/pick_reason{"reason":"feeling_ignored"}'
+          payload: '/pick_reason{{"reason":"feeling_ignored"}}'
         - title: "Loud/noisy environment"
-          payload: '/pick_reason{"reason":"overstimulation"}'
+          payload: '/pick_reason{{"reason":"overstimulation"}}'
         - title: "I don't know"
-          payload: '/pick_reason{"reason":"dont_know"}'
+          payload: '/pick_reason{{"reason":"dont_know"}}'
         # Note: removed "Continue without picking a reason" option as requested
 
   utter_ask_reason_after_affirm:
@@ -131,7 +131,7 @@ responses:
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
 
   utter_stage_common_ground:
-    - text: "You chose this emotion, and that was really good. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below."
+    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below. If you'd like to continue to something small, you can press 'Yes' below."
 
   utter_stage_acceptance:
     - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
@@ -146,9 +146,9 @@ responses:
     - text: "Would you like to continue?"
       buttons:
         - title: "Yes"
-          payload: '/affirm{"affirmation":"yes"}'
+          payload: '/affirm{{"affirmation":"yes"}}'
         - title: "Not right now"
-          payload: '/deny{"denial":"no"}'
+          payload: '/deny{{"denial":"no"}}'
 
   utter_support_done:
     - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."

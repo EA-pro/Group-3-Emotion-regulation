@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot</title>
+    <title>Feelix</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -19,12 +19,15 @@
         <div class="main-content">
             <div class="chat-header">
                 <div class="chat-title">
-                    <i class="fa-solid fa-robot"></i>
-                    <h2>Chatbot</h2>
+                    <img src="images/happy-robot.svg" alt="Chatbot" class="bot-avatar-header">
+                    <h2>Feelix</h2>
                 </div>
                 <div class="chat-actions">
-                    <button class="btn btn-clear">
-                        <i class="fa-solid fa-broom"></i>
+                    <button class="btn btn-info" id="info-button">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                    <button class="btn btn-trash">
+                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             </div>
@@ -43,12 +46,40 @@
                     </div>
                     <div class="voice-controls">
                         <label class="voice-toggle">
-                            <input type="checkbox" id="autoReadResponses" checked>
+                            <input type="checkbox" id="autoReadResponses">
                             <span>Auto-read responses</span>
                         </label>
                         <div class="voice-indicator">Listening...</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">About Feelix</h3>
+                <button class="modal-close" id="close-info-modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Feelix is your emotional support companion, designed to help you navigate and understand your emotions.</p>
+                <br>
+                <p><strong>Features:</strong></p>
+                <ul style="list-style: disc; margin-left: 20px; margin-top: 10px;">
+                    <li>Emotion recognition and validation</li>
+                    <li>Personalized emotional support</li>
+                    <li>Voice interaction capabilities</li>
+                    <li>Private and secure conversations</li>
+                </ul>
+                <br>
+                <p>Feel free to share your feelings and thoughts. Feelix is here to listen and support you.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="close-info-modal-btn">Got it</button>
             </div>
         </div>
     </div>
@@ -69,6 +100,33 @@
     </script>
     <script src="js/rasa-api.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Info Modal Script -->
+    <script>
+        const infoButton = document.getElementById('info-button');
+        const infoModal = document.getElementById('info-modal');
+        const closeModalBtn = document.getElementById('close-info-modal');
+        const closeModalFooterBtn = document.getElementById('close-info-modal-btn');
+
+        infoButton.addEventListener('click', () => {
+            infoModal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            infoModal.classList.remove('active');
+        });
+
+        closeModalFooterBtn.addEventListener('click', () => {
+            infoModal.classList.remove('active');
+        });
+
+        // Close modal when clicking outside
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) {
+                infoModal.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 
 </html>

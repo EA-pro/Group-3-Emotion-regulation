@@ -105,11 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const micButton = document.querySelector('.mic-button');
     const voiceIndicator = document.querySelector('.voice-indicator');
     const voiceControls = document.querySelector('.voice-controls');
-    const clearButton = document.querySelector('.btn-clear');
+    const clearButton = document.querySelector('.btn-trash');
 
     // State
     let isTyping = false;
     let conversationContext = {};
+    let senderId = 'user_' + Math.random().toString(36).substring(2);
 
     // Initialize
     chatInput.focus();
@@ -286,22 +287,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show typing indicator
         showTypingIndicator();
+        const typingStartTime = Date.now();
 
         // Send message to Python backend and get response
-        fetch('/api/send_message', { 
+        const fetchPromise = fetch('/api/send_message', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message: message, context: conversationContext })
+            body: JSON.stringify({ message: message, context: conversationContext, sender: senderId })
         })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
                 }
                 return response.json();
-            })
-            .then(data => {
+            });
+
+        // Wait for both the response AND minimum 1 second typing delay
+        const minDelayPromise = new Promise(resolve => {
+            const elapsed = Date.now() - typingStartTime;
+            const remaining = Math.max(0, 1000 - elapsed);
+            setTimeout(resolve, remaining);
+        });
+
+        Promise.all([fetchPromise, minDelayPromise])
+            .then(([data]) => {
                 console.log("Response from Rasa:", data); // Debug: log the response
                 const responseTimestamp = new Date();
                 hideTypingIndicator();
@@ -325,6 +336,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Send a button payload to the backend
+     * @param {string} payload - The payload string (e.g.,
+     "/mood_angry{\"mood\":\"angry\"}")
+     * @param {string} buttonTitle - The button title to display (e.g., "😡 Angry" or "I feel frustrated")
+    */
+    function sendPayloadMessage(payload, buttonTitle = null) {
+        const timestamp = new Date();
+
+        // Use button title if provided, otherwise parse payload
+        const displayText = buttonTitle || (payload.match(/^\/([a-z_]+)/) ? payload.match(/^\/([a-z_]+)/)[1].replace(/_/g, ' ') : payload);
+
+        // Show user's choice in chat (shows what button they clicked)
+        addMessageToChat('user', displayText, timestamp);
+
+        // Save to database
+        window.DB.saveConversation({
+            sender: 'user',
+            message: payload,
+            context: conversationContext,
+            timestamp: timestamp.toISOString()
+        });
+
+        showTypingIndicator();
+        const typingStartTime = Date.now();
+
+        const fetchPromise = fetch('/api/send_message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: payload,
+                context: conversationContext,
+                sender: senderId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}:
+    ${response.statusText}`);
+            }
+            return response.json();
+        });
+
+        // Wait for both the response AND minimum 1 second typing delay
+        const minDelayPromise = new Promise(resolve => {
+            const elapsed = Date.now() - typingStartTime;
+            const remaining = Math.max(0, 1000 - elapsed);
+            setTimeout(resolve, remaining);
+        });
+
+        Promise.all([fetchPromise, minDelayPromise])
+        .then(([data]) => {
+            const responseTimestamp = new Date();
+            hideTypingIndicator();
+            handleRasaResponse(data, responseTimestamp);
+        })
+        .catch(error => {
+            console.error('Error sending payload:', error);
+            hideTypingIndicator();
+            addMessageToChat('bot', 'Sorry, I encountered an error.', new Date());
+        });
+    }
+
+    /**
      * Handle Rasa response and perform actions based on it
      * @param {Object} response - Response from Rasa backend
      * @param {Date} timestamp - Timestamp when response was received
@@ -336,7 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Array.isArray(response)) {
             response.forEach(message => {
                 if (message.text) {
-                    addMessageToChat('bot', message.text, timestamp);
+                    const buttons = message.buttons || null;
+                    addMessageToChat('bot', message.text, timestamp, true, buttons);
 
                     // Save bot response to database
                     window.DB.saveConversation({
@@ -354,7 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.messages && response.messages.length > 0) {
             response.messages.forEach(message => {
                 if (message.text) {
-                    addMessageToChat('bot', message.text, timestamp);
+                    const buttons = message.buttons || null;
+                    addMessageToChat('bot', message.text, timestamp, true, buttons);
 
                     // Save bot response to database
                     window.DB.saveConversation({
@@ -432,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Add a message to the chat
      */
-    function addMessageToChat(sender, text, timestamp = new Date(), newMessage = true) {
+    function addMessageToChat(sender, text, timestamp = new Date(), newMessage = true, buttons = null) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
         messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
@@ -440,9 +518,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatarDiv = document.createElement('div');
         avatarDiv.classList.add('message-avatar');
 
-        const avatarIcon = document.createElement('i');
-        avatarIcon.classList.add('fa-solid');
-        avatarIcon.classList.add(sender === 'user' ? 'fa-user' : 'fa-robot');
+        const avatarIcon = sender === 'user'
+            ? document.createElement('i')
+            : document.createElement('img');
+
+        if (sender === 'user') {
+            avatarIcon.classList.add('fa-solid', 'fa-user');
+        } else {
+            avatarIcon.src = 'images/happy-robot.svg';
+            avatarIcon.alt = 'Bot';
+            avatarIcon.classList.add('bot-avatar-icon');
+        }
 
         avatarDiv.appendChild(avatarIcon);
         messageDiv.appendChild(avatarDiv);
@@ -477,6 +563,31 @@ document.addEventListener('DOMContentLoaded', () => {
         contentDiv.appendChild(timeDiv);
         messageDiv.appendChild(contentDiv);
 
+        if (buttons && buttons.length > 0) {
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('chat-suggestions');
+
+            buttons.forEach(button => {
+                const buttonElement = document.createElement('button');
+                buttonElement.classList.add('suggestion-chip');
+                buttonElement.textContent = button.title;
+                buttonElement.addEventListener('click', () => {
+                    const payload = button.payload;
+                    sendPayloadMessage(payload, button.title);
+
+                    buttonsContainer.querySelectorAll('.suggestion-chip').forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                        btn.style.cursor = 'not-allowed';
+                    });
+                });
+
+                buttonsContainer.appendChild(buttonElement);
+            });
+
+            contentDiv.appendChild(buttonsContainer);
+        }
+
         chatMessages.appendChild(messageDiv);
         scrollToBottom();
 
@@ -499,8 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatarDiv = document.createElement('div');
         avatarDiv.classList.add('message-avatar');
 
-        const avatarIcon = document.createElement('i');
-        avatarIcon.classList.add('fa-solid', 'fa-robot');
+        const avatarIcon = document.createElement('img');
+        avatarIcon.src = 'images/happy-robot.svg';
+        avatarIcon.alt = 'Bot';
+        avatarIcon.classList.add('bot-avatar-icon');
 
         avatarDiv.appendChild(avatarIcon);
         typingDiv.appendChild(avatarDiv);
@@ -542,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Clear chat messages with confirmation
      */
-    function clearChat() {
+    async function clearChat() {
         // Show a confirmation dialog
         const confirmClear = confirm("Are you sure you want to clear the chat history? This action cannot be undone.");
 
@@ -550,11 +663,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const messages = Array.from(document.querySelectorAll('.message'));
             messages.forEach(msg => msg.remove());
 
-            // Clear conversations from database
-            clearConversationsFromDB();
+            // Clear conversations from database and wait for it to complete
+            await clearConversationsFromDB();
 
             // Reset conversation context
             conversationContext = {};
+
+            // Generate new sender ID for fresh Rasa conversation
+            senderId = 'user_' + Math.random().toString(36).substring(2);
+
+            console.log('Chat cleared successfully');
         }
     }
 
@@ -565,6 +683,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await window.DB.db.conversations.clear();
             console.log('Deleted all conversations from database');
+
+            // Verify the database is actually empty
+            const count = await window.DB.db.conversations.count();
+            console.log('Conversations remaining in DB:', count);
+
+            if (count === 0) {
+                console.log('Database successfully cleared!');
+            } else {
+                console.error('Database still has conversations after clearing!');
+            }
         } catch (error) {
             console.error('Error clearing conversations from database:', error);
         }
@@ -586,13 +714,13 @@ window.speakText = speakText;
 function sendToRasa(message) {
     // Create a timestamp
     const timestamp = new Date();
-    
+
     // Show message in chat
     addMessageToChat('user', message, timestamp);
-    
+
     // Show typing indicator
     showTypingIndicator();
-    
+
     // Send to Rasa
     fetch('/api/send_message', {
         method: 'POST',

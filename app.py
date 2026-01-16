@@ -48,10 +48,11 @@ def send_message():
     data = request.json
     message = data.get('message')
     context = data.get('context', {})
+    sender = data.get('sender', 'user')
 
     rasa_url = os.environ.get('RASA_URL', DEFAULT_RASA_URL)
     payload = {
-        "sender": "user",
+        "sender": sender,
         "message": message,
         "metadata": context
     }

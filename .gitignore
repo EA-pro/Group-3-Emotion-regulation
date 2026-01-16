@@ -3,6 +3,7 @@
 .vscode/
 *.code-workspace
 .env
+venv/
 
 # Settings directory - ignore completely
 settings/
