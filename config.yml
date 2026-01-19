@@ -12,9 +12,9 @@ pipeline:
       active: false
 
 policies:
+  - name: RulePolicy
+  - name: MemoizationPolicy
   - name: FlowPolicy
-  
-  # Voeg de Enterprise Search Policy toe
   - name: EnterpriseSearchPolicy
     llm:
       model_group: gemini_search_generation_model

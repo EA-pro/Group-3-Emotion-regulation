@@ -10,6 +10,8 @@ intents:
   - deny
   - pick_reason
   - check_mood
+  - continue_yes
+  - continue_no
 
 entities:
   - mood
@@ -75,7 +77,7 @@ responses:
     - text: "It’s okay to feel sad. 💙 Thank you for trusting me and telling me. Sad feelings can feel heavy, but you’re not alone, we can take this slowly together."
 
   utter_reflect_mood_angry:
-    - text: "It sounds like you're feeling really angry right now. 😠 That's okay, big feelings can be tough to hold. I'm right here with you, and we can take some calm steps together to help your body settle down."
+    - text: "So you are feeling quite angry right now. 😠 That's okay, big feelings can be tough to hold. I'm right here with you, and we can take some steps together to help you calm down and feel better."
 
   utter_reason_why_you_feel_upset_question:
     - text: "Let's slow down for a moment. 💛 Do you know what made you feel upset?"
@@ -92,15 +94,15 @@ responses:
     - text: "Here are some common reasons children might feel sad:" 
       buttons:
         - title: "I'm tired"
-          payload: '/pick_reason{{"reason":"tired"}}'
+          payload: '/pick_reason{{"reason":"that you are tired"}}'
         - title: "I miss someone"
-          payload: '/pick_reason{{"reason":"missing_someone"}}'
+          payload: '/pick_reason{{"reason":"missing someone"}}'
         - title: "Something changed at home"
-          payload: '/pick_reason{{"reason":"change_in_routine"}}'
+          payload: '/pick_reason{{"reason":"a change in your routine"}}'
         - title: "Worried about school"
-          payload: '/pick_reason{{"reason":"worry_school"}}'
+          payload: '/pick_reason{{"reason":"your worry about school"}}'
         - title: "I don't know"
-          payload: '/pick_reason{{"reason":"dont_know"}}'
+          payload: '/pick_reason{{"reason":"dont know"}}'
         # Note: removed "Continue without picking a reason" option as requested
 
   utter_overview_common_reasons_angry:
@@ -109,13 +111,13 @@ responses:
         - title: "I feel frustrated"
           payload: '/pick_reason{{"reason":"frustration"}}'
         - title: "Someone upset me"
-          payload: '/pick_reason{{"reason":"someone_bothered_me"}}'
+          payload: '/pick_reason{{"reason":"someone bothering you"}}'
         - title: "I feel ignored"
-          payload: '/pick_reason{{"reason":"feeling_ignored"}}'
+          payload: '/pick_reason{{"reason":"are feeling ignored"}}'
         - title: "Loud/noisy environment"
           payload: '/pick_reason{{"reason":"overstimulation"}}'
         - title: "I don't know"
-          payload: '/pick_reason{{"reason":"dont_know"}}'
+          payload: '/pick_reason{{"reason":"dont know"}}'
         # Note: removed "Continue without picking a reason" option as requested
 
   utter_ask_reason_after_affirm:
@@ -131,7 +133,7 @@ responses:
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
 
   utter_stage_common_ground:
-    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below. If you'd like to continue to something small, you can press 'Yes' below."
+    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace."
 
   utter_stage_acceptance:
     - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
@@ -142,20 +144,20 @@ responses:
   utter_stage_nuance:
     - text: "One small reframe might help make the feeling a bit lighter. No pressure — it's just a gentle way to think about things differently. Shall we give it a try?"
 
-  utter_stage_continue_question:
-    - text: "Would you like to continue?"
-      buttons:
-        - title: "Yes"
-          payload: '/affirm{{"affirmation":"yes"}}'
-        - title: "Not right now"
-          payload: '/deny{{"denial":"no"}}'
-
   utter_support_done:
     - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."
 
   utter_divider:
     - text: "──────────"
  
+  utter_stage_continue_question:
+    - text: "Would you like to continue?"
+      buttons:
+        - title: "Yes"
+          payload: "/continue_yes"
+        - title: "Not right now"
+          payload: "/continue_no"
+
 actions:
   - action_start_reflect_flow
   - action_handle_reason_response

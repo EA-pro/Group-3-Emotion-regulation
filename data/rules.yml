@@ -1,10 +1,12 @@
 version: "3.1"
 
 rules:
-
-- rule: restart conversation
+- rule: Continue support flow
   steps:
-  - intent: restart
-  - action: action_restart
+  - intent: continue_yes
+  - action: action_handle_support_flow
 
-
+- rule: Stop support flow
+  steps:
+  - intent: continue_no
+  - action: action_handle_support_flow

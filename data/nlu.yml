@@ -82,3 +82,13 @@ nlu:
     - Do you remember how I was feeling?
     - How did I say I felt?
     - What did I tell you I felt?
+
+- intent: continue_yes
+  examples: |
+    - yes
+    - continue
+
+- intent: continue_no
+  examples: |
+    - no
+    - not right now

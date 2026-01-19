@@ -213,7 +213,25 @@ class ActionHandleSupportFlow(Action):
         # If currently in common_ground and user affirmed, go to acceptance
         if stage == "common_ground":
             if intent == "affirm":
-                dispatcher.utter_message(response="utter_stage_acceptance")
+                reason = tracker.get_slot("reason") or ""
+                mood = tracker.get_slot("mood") or ""
+
+                # Reason -> “hard times pass” message (edit freely)
+                PASS_MESSAGES = {
+                    "missing someone": "Missing someone can really ache. 💛 The feeling can come in waves, but it won’t stay this intense forever — it usually softens little by little.",
+                    "I'm tired": "When you’re tired, feelings can feel extra heavy. 💛 Rest and a bit of care for your body often makes it easier again.",
+                    "change_in_routine": "Changes can feel scary or unsettling. 💛 Your brain needs time to get used to new things — and that’s something that gets easier with time.",
+                    "worry_school": "School worries can feel big. 💛 They can shrink when we break them into tiny steps and get support.",
+                    "frustration": "Frustration can feel like pressure inside. 💛 That pressure can ease when we slow down and do one small thing at a time.",
+                    "someone_bothered_me": "When someone upsets you, it can stay stuck in your body for a while. 💛 But feelings move — they don’t stay the same forever.",
+                    "feeling_ignored": "Feeling ignored can hurt. 💛 That hurt can soften, especially when we find a small way to feel seen again.",
+                    "overstimulation": "Too much noise or too many things can overwhelm you. 💛 When things get calmer, your body usually settles too.",
+                } 
+
+                # fall back if reason isn't found
+                pass_text = PASS_MESSAGES.get(reason, "Big feelings can feel endless, but they do pass. 💛 They can get smaller little by little.")
+
+                dispatcher.utter_message(text=pass_text)
                 dispatcher.utter_message(response="utter_stage_continue_question")
                 return [SlotSet("support_stage", "acceptance")]
             elif intent == "deny":
