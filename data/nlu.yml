@@ -49,6 +49,13 @@ nlu:
     - nieuw gesprek
     - begin opnieuw
     - start again
+    - can we start over
+    - can we restart
+    - start over
+    - restart
+    - let's start again
+    - can we begin again
+    - reset
 
 - intent: affirm
   examples: |

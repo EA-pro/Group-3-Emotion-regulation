@@ -2,8 +2,10 @@ from typing import Any, Dict, List, Text
 import time
 
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet, FollowupAction
+from rasa_sdk.events import SlotSet, FollowupAction, Restarted
 from rasa_sdk.executor import CollectingDispatcher
+
+
 
 
 class ActionCheckSufficientFunds(Action):
@@ -273,3 +275,17 @@ class ActionGetStoredMood(Action):
         else:
             dispatcher.utter_message(text="I don't have a record of how you were feeling yet. Would you like to tell me?")
         return []
+    
+class ActionRestartConversation(Action):
+    def name(self) -> str:
+        return "action_restart_conversation"
+
+    async def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_restart_ok")
+
+        # Restart clears the conversation state (including slots) back to the start.
+        # Then we immediately start your reflect/mood flow again.
+        return [
+            Restarted(),
+            FollowupAction("action_start_reflect_flow"),
+        ]

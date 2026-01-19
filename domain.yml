@@ -10,6 +10,7 @@ intents:
   - deny
   - pick_reason
   - check_mood
+  - restart
 
 entities:
   - mood
@@ -131,7 +132,7 @@ responses:
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
 
   utter_stage_common_ground:
-    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below. If you'd like to continue to something small, you can press 'Yes' below."
+    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace."
 
   utter_stage_acceptance:
     - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
@@ -155,6 +156,10 @@ responses:
 
   utter_divider:
     - text: "──────────"
+
+  utter_restart_ok:
+    - text: "Of course — we can start over. 💛"
+
  
 actions:
   - action_start_reflect_flow
@@ -162,3 +167,4 @@ actions:
   - action_handle_pick_reason
   - action_handle_support_flow
   - action_get_stored_mood
+  - action_restart_conversation
