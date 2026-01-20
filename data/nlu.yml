@@ -82,3 +82,21 @@ nlu:
     - Do you remember how I was feeling?
     - How did I say I felt?
     - What did I tell you I felt?
+
+- intent: ask_question
+  examples: |
+    - what is anger
+    - what is sadness
+    - what is emotion regulation
+    - how can I calm down
+    - why do I feel this way
+    - what are some calming strategies
+    - tell me about emotions
+    - how do I deal with frustration
+    - what causes anger
+    - how can I express my feelings
+    - what should I do when I'm upset
+    - can you explain what anger means
+    - help me understand my feelings
+    - what are triggers
+    - how do I ask for help

@@ -31,31 +31,21 @@ flows:
       # After the user sees the overview of common reasons, let them pick one
       - action: action_handle_pick_reason
       - action: action_listen
-
-  flow_reflect_happy:
-    description: >
-      Flow that runs after the user selects "happy" — shows the happy
-      reflection message and completes.
-    steps:
-      - action: utter_reflect_mood_happy
+      # Support flow - stage 1 (common_ground)
+      - action: action_handle_support_flow
       - action: action_listen
-
-  flow_reflect_sad:
-    description: >
-      Flow that runs after the user selects "sad" — shows the sad
-      reflection message and completes.
-    steps:
-      - action: utter_reflect_mood_sad
+      # Support flow - stage 2 (acceptance)
+      - action: action_handle_support_flow
       - action: action_listen
-
-  flow_reflect_angry:
-    description: >
-      Flow that runs after the user selects "angry" — shows the angry
-      reflection message and completes.
-    steps:
-      - action: utter_reflect_mood_angry
+      # Support flow - stage 3 (analysis)
+      - action: action_handle_support_flow
       - action: action_listen
-  
+      # Support flow - stage 4 (nuance)
+      - action: action_handle_support_flow
+      - action: action_listen
+      # Support flow - completion
+      - action: action_handle_support_flow
+
   pattern_search:
     description: handle a knowledge-based question or request
     name: pattern search

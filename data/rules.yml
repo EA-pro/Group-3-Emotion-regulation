@@ -7,4 +7,9 @@ rules:
   - intent: restart
   - action: action_restart
 
+- rule: answer knowledge question
+  steps:
+  - intent: ask_question
+  - action: action_trigger_search
+
 

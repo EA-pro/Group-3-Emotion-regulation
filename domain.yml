@@ -10,6 +10,7 @@ intents:
   - deny
   - pick_reason
   - check_mood
+  - ask_question
 
 entities:
   - mood
