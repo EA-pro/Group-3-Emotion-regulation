@@ -12,6 +12,7 @@ intents:
   - check_mood
   - restart
   - ask_question
+  - share_problem
 
 entities:
   - mood
@@ -111,7 +112,6 @@ responses:
           payload: '/pick_reason{{"reason":"worry_school"}}'
         - title: "I don't know"
           payload: '/pick_reason{{"reason":"dont_know"}}'
-        # Note: removed "Continue without picking a reason" option as requested
 
   utter_overview_common_reasons_angry:
     - text: "Here are some common reasons children might feel angry:"
@@ -126,42 +126,15 @@ responses:
           payload: '/pick_reason{{"reason":"overstimulation"}}'
         - title: "I don't know"
           payload: '/pick_reason{{"reason":"dont_know"}}'
-        # Note: removed "Continue without picking a reason" option as requested
 
   utter_ask_reason_after_affirm:
     - text: "Thank you for sharing that you know why you feel {mood}. I'm listening — what happened?"
-
-  utter_can_do_something_else:
-    - text: "Thank you for sharing that with me. 🌿 If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
 
   utter_reason_unknown_exercise:
     - text: "It’s completely okay not to know. 💛 Let’s give your heart and body a moment to settle. How about a tiny calm break and take a slow sip of water."
 
   utter_reason_unknown_ask_later: 
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
-
-  utter_stage_common_ground:
-    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace."
-
-  utter_stage_acceptance:
-    - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
-
-  utter_stage_analysis:
-    - text: "Sometimes noticing small details can help. We can look together for one small thing that might have made this stronger. Would you like to continue to the next step?"
-
-  utter_stage_nuance:
-    - text: "One small reframe might help make the feeling a bit lighter. No pressure — it's just a gentle way to think about things differently. Shall we give it a try?"
-
-  utter_stage_continue_question:
-    - text: "Would you like to continue?"
-      buttons:
-        - title: "Yes"
-          payload: '/affirm{{"affirmation":"yes"}}'
-        - title: "Not right now"
-          payload: '/deny{{"denial":"no"}}'
-
-  utter_support_done:
-    - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."
 
   utter_support_done_check_mood:
     - text: "Thanks for going through that with me. Now that we've taken those steps, how are you feeling?"
@@ -188,7 +161,6 @@ responses:
   utter_restart_ok:
     - text: "Of course — we can start over. 💛"
 
- 
 actions:
   - action_start_reflect_flow
   - action_handle_reason_response
@@ -196,3 +168,4 @@ actions:
   - action_handle_support_flow
   - action_get_stored_mood
   - action_restart_conversation
+  - action_trigger_search
