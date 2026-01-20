@@ -13,6 +13,7 @@ pipeline:
 
 policies:
   - name: FlowPolicy
+  - name: RulePolicy
   
   # Voeg de Enterprise Search Policy toe
   - name: EnterpriseSearchPolicy

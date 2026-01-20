@@ -10,8 +10,9 @@ intents:
   - deny
   - pick_reason
   - check_mood
-  - restart
+  - restart_conversation
   - ask_question
+  - play_riddle
 
 entities:
   - mood
@@ -60,6 +61,31 @@ slots:
   last_mood:
     type: text
     influence_conversation: false
+
+  riddle_question:
+    type: text
+    influence_conversation: false
+
+  riddle_answer:
+    type: text
+    influence_conversation: false
+
+  riddle_attempts:
+    type: float
+    influence_conversation: false
+
+  guess:
+    type: text
+    influence_conversation: false
+
+  riddle_trigger_text:
+    type: text
+    influence_conversation: false
+
+forms:
+  riddle_form:
+    required_slots:
+      - guess
 
 responses:
   utter_ask_mood_intro:
@@ -188,6 +214,9 @@ responses:
   utter_restart_ok:
     - text: "Of course — we can start over. 💛"
 
+  utter_ask_riddle_form_guess:
+    - text: "What's your guess?"
+
  
 actions:
   - action_start_reflect_flow
@@ -196,3 +225,6 @@ actions:
   - action_handle_support_flow
   - action_get_stored_mood
   - action_restart_conversation
+  - action_fetch_riddle
+  - validate_riddle_form
+  - action_reset_riddle

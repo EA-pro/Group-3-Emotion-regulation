@@ -51,3 +51,12 @@ flows:
     name: pattern search
     steps:
       - action: action_trigger_search      
+
+  flow_riddle_game:
+    description: >
+      Start when the user asks to play a game or wants a riddle. Fetch a riddle,
+      then collect guesses with up to three tries.
+    steps:
+      - action: action_fetch_riddle
+      - action: riddle_form
+      - action: action_listen

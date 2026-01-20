@@ -1,9 +1,21 @@
 from typing import Any, Dict, List, Text
+import os
+import re
 import time
 
+import requests
+from dotenv import load_dotenv
 from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet, FollowupAction, Restarted
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.forms import FormValidationAction
+
+load_dotenv()
+
+
+def _has_user_text(tracker: Tracker) -> bool:
+    text = (tracker.latest_message.get("text") or "").strip()
+    return bool(text)
 
 
 
@@ -18,6 +30,8 @@ class ActionCheckSufficientFunds(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
+        if not _has_user_text(tracker):
+            return []
         # hard-coded balance for tutorial purposes. in production this
         # would be retrieved from a database or an API
         balance = 1000
@@ -37,6 +51,8 @@ class ActionStartReflectFlow(Action):
         domain: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """Dispatch the correct reflection utterance based on the mood slot."""
+        if not _has_user_text(tracker):
+            return []
         # Determine current intent and handle mood selection
         intent = tracker.latest_message.get("intent", {}).get("name")
         mood = tracker.get_slot("mood")
@@ -113,6 +129,8 @@ class ActionHandleReasonResponse(Action):
         domain: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """Handle the user's response to 'Do you know what made you feel upset?'"""
+        if not _has_user_text(tracker):
+            return []
         intent = tracker.latest_message.get("intent", {}).get("name")
         
         print(f"[action_handle_reason_response] intent={intent}")
@@ -155,6 +173,8 @@ class ActionHandlePickReason(Action):
         If they still don't know (dont_know), send two follow-up messages.
         Otherwise, acknowledge the selected reason.
         """
+        if not _has_user_text(tracker):
+            return []
         intent = tracker.latest_message.get("intent", {}).get("name")
         expect_free_reason = tracker.get_slot("expect_free_reason")
 
@@ -218,6 +238,8 @@ class ActionHandleSupportFlow(Action):
            Uses a slot 'support_stage' to track progress. If user answers 'affirm' to continue,
            proceed; if 'deny', stop the flow.
         """
+        if not _has_user_text(tracker):
+            return []
         intent = tracker.latest_message.get("intent", {}).get("name")
         stage = tracker.get_slot("support_stage")
         mood = tracker.get_slot("mood")
@@ -326,6 +348,8 @@ class ActionGetStoredMood(Action):
         tracker: Tracker,
         domain: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
+        if not _has_user_text(tracker):
+            return []
         last_mood = tracker.get_slot("last_mood")
         if last_mood:
             dispatcher.utter_message(text=f"I have stored that you felt {last_mood}. If you'd like, we can explore that more.")
@@ -338,6 +362,8 @@ class ActionRestartConversation(Action):
         return "action_restart_conversation"
 
     async def run(self, dispatcher, tracker, domain):
+        if not _has_user_text(tracker):
+            return []
         dispatcher.utter_message(response="utter_restart_ok")
 
         # Restart clears the conversation state (including slots) back to the start.
@@ -345,4 +371,193 @@ class ActionRestartConversation(Action):
         return [
             Restarted(),
             FollowupAction("action_start_reflect_flow"),
+        ]
+
+
+def _normalize_riddle_text(text: str) -> str:
+    if not text:
+        return ""
+    text = text.lower().strip()
+    text = re.sub(r"[^a-z0-9]+", "", text)
+    return text
+
+
+def _tokenize_riddle_text(text: str) -> List[str]:
+    if not text:
+        return []
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+class ActionFetchRiddle(Action):
+    def name(self) -> Text:
+        return "action_fetch_riddle"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        if not _has_user_text(tracker):
+            return []
+        api_key = os.getenv("API_NINJAS_KEY")
+        if not api_key:
+            dispatcher.utter_message(text="Riddle API key is missing on the server.")
+            return []
+
+        try:
+            response = requests.get(
+                "https://api.api-ninjas.com/v1/riddles",
+                headers={"X-Api-Key": api_key},
+                timeout=8,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except requests.RequestException:
+            dispatcher.utter_message(
+                text="I couldn't reach the riddle service right now. Try again later."
+            )
+            return []
+
+        if not data or not isinstance(data, list):
+            dispatcher.utter_message(
+                text="I didn't get a valid riddle back. Try again."
+            )
+            return []
+
+        riddle = data[0] if data else {}
+        question = riddle.get("question")
+        answer = riddle.get("answer")
+
+        if not question or not answer:
+            dispatcher.utter_message(
+                text="That riddle response was incomplete. Try again."
+            )
+            return []
+
+        dispatcher.utter_message(text=f"Certainly! Here's your riddle:\n\n{question}")
+
+        return [
+            SlotSet("riddle_question", question),
+            SlotSet("riddle_answer", answer),
+            SlotSet("riddle_attempts", 0),
+            SlotSet("guess", None),
+            SlotSet("riddle_trigger_text", tracker.latest_message.get("text")),
+        ]
+
+
+class ValidateRiddleForm(FormValidationAction):
+    def name(self) -> Text:
+        return "validate_riddle_form"
+
+    def extract_guess(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> Dict[Text, Any]:
+        intent = tracker.latest_message.get("intent", {}).get("name")
+        if intent == "play_riddle":
+            return {}
+
+        text = (tracker.latest_message.get("text") or "").strip()
+        if not text:
+            return {}
+
+        if text == (tracker.get_slot("riddle_trigger_text") or "").strip():
+            return {}
+
+        return {"guess": text}
+
+    def validate_guess(
+        self,
+        value: Text,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> Dict[Text, Any]:
+        trigger_text = (tracker.get_slot("riddle_trigger_text") or "").strip()
+        if not value or not value.strip():
+            return {"guess": None}
+        if trigger_text and value.strip() == trigger_text:
+            return {"guess": None}
+
+        answer = tracker.get_slot("riddle_answer") or ""
+        attempts = tracker.get_slot("riddle_attempts") or 0
+
+        attempts = int(attempts) + 1
+
+        user_guess_norm = _normalize_riddle_text(value)
+        answer_norm = _normalize_riddle_text(answer)
+        user_tokens = _tokenize_riddle_text(value)
+        answer_tokens = _tokenize_riddle_text(answer)
+
+        stop_words = {
+            "a",
+            "an",
+            "the",
+            "my",
+            "your",
+            "everyone",
+            "everybody",
+            "has",
+            "have",
+            "one",
+            "is",
+            "are",
+            "its",
+            "it's",
+            "to",
+            "of",
+        }
+        user_core = [token for token in user_tokens if token not in stop_words]
+        answer_core = [token for token in answer_tokens if token not in stop_words]
+
+        exact_match = user_guess_norm and answer_norm and user_guess_norm == answer_norm
+        substring_match = user_guess_norm and answer_norm and (
+            user_guess_norm in answer_norm or answer_norm in user_guess_norm
+        )
+        core_match = bool(user_core) and bool(answer_core) and (
+            user_core == answer_core or set(user_core) == set(answer_core)
+        )
+
+        if exact_match or substring_match or core_match:
+            dispatcher.utter_message(text="Yes! That's correct.")
+            return {
+                "guess": value,
+                "riddle_attempts": attempts,
+                "riddle_trigger_text": None,
+            }
+
+        if attempts < 3:
+            tries_left = 3 - attempts
+            dispatcher.utter_message(
+                text=f"No. Try again! ({tries_left} {'try' if tries_left == 1 else 'tries'} left)"
+            )
+            return {"guess": None, "riddle_attempts": attempts}
+
+        dispatcher.utter_message(text=f"Nope — third try. The answer was: {answer}.")
+        return {
+            "guess": value,
+            "riddle_attempts": attempts,
+            "riddle_trigger_text": None,
+        }
+
+
+class ActionResetRiddle(Action):
+    def name(self) -> Text:
+        return "action_reset_riddle"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        return [
+            SlotSet("riddle_question", None),
+            SlotSet("riddle_answer", None),
+            SlotSet("riddle_attempts", None),
+            SlotSet("guess", None),
+            SlotSet("riddle_trigger_text", None),
         ]

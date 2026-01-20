@@ -43,7 +43,7 @@ nlu:
     - Angry
     - "😡 Angry"
 
-- intent: restart
+- intent: restart_conversation
   examples: |
     - restart
     - nieuw gesprek
@@ -108,3 +108,12 @@ nlu:
     - help me understand my feelings
     - what are triggers
     - how do I ask for help
+
+- intent: play_riddle
+  examples: |
+    - can we play a riddle
+    - tell me a riddle
+    - riddle time
+    - give me a riddle
+    - i want a riddle
+    - let's do a riddle
