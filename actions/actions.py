@@ -2,8 +2,10 @@ from typing import Any, Dict, List, Text
 import time
 
 from rasa_sdk import Action, Tracker
-from rasa_sdk.events import SlotSet, FollowupAction
+from rasa_sdk.events import SlotSet, FollowupAction, Restarted
 from rasa_sdk.executor import CollectingDispatcher
+
+
 
 
 class ActionCheckSufficientFunds(Action):
@@ -38,6 +40,7 @@ class ActionStartReflectFlow(Action):
         # Determine current intent and handle mood selection
         intent = tracker.latest_message.get("intent", {}).get("name")
         mood = tracker.get_slot("mood")
+        support_completed = tracker.get_slot("support_completed")
 
         # Normalize mood to expected keys
         if isinstance(mood, str):
@@ -61,6 +64,24 @@ class ActionStartReflectFlow(Action):
             "sad": "utter_reflect_mood_sad",
             "angry": "utter_reflect_mood_angry",
         }
+
+        # If we just completed the support flow, acknowledge the new mood and end.
+        if support_completed and mood_key in utter_mapping:
+            followup_mapping = {
+                "happy": "utter_followup_mood_happy",
+                "sad": "utter_followup_mood_sad",
+                "angry": "utter_followup_mood_angry",
+            }
+            utter_name = followup_mapping.get(mood_key)
+            if utter_name:
+                dispatcher.utter_message(response=utter_name)
+                if mood_key in ["sad", "angry"]:
+                    dispatcher.utter_message(response="utter_reason_why_you_feel_upset_question")
+                return [
+                    SlotSet("support_completed", None),
+                    SlotSet("mood", mood_key),
+                    SlotSet("last_mood", mood_key),
+                ]
 
         utter_name = utter_mapping.get(mood_key)
 
@@ -110,18 +131,11 @@ class ActionHandleReasonResponse(Action):
             else:
                 # Fallback to the generic overview if mood is unknown
                 dispatcher.utter_message(response="utter_overview_common_reasons_sad")
-                return []
+            return [SlotSet("expect_free_reason", None)]
         elif intent == "affirm":
-            # User knows the reason: ask them to pick which reason matches
+            # User knows the reason: create space for them to explain it
             dispatcher.utter_message(response="utter_ask_reason_after_affirm")
-            mood = tracker.get_slot("mood")
-            if mood == "sad":
-                dispatcher.utter_message(response="utter_overview_common_reasons_sad")
-            elif mood == "angry":
-                dispatcher.utter_message(response="utter_overview_common_reasons_angry")
-            else:
-                dispatcher.utter_message(response="utter_overview_common_reasons_sad")
-                return []
+            return [SlotSet("expect_free_reason", True)]
         # For any other intent (mood_happy, mood_sad, mood_angry), do nothing
         # and let the flow handle it
         return []
@@ -142,7 +156,23 @@ class ActionHandlePickReason(Action):
         Otherwise, acknowledge the selected reason.
         """
         intent = tracker.latest_message.get("intent", {}).get("name")
-        reason = tracker.get_slot("reason") or tracker.latest_message.get("entities", [{}])[0].get("value")
+        expect_free_reason = tracker.get_slot("expect_free_reason")
+
+        if not expect_free_reason and intent != "pick_reason":
+            # Only accept free-text reasons when explicitly prompted after "Yes".
+            return []
+
+        reason = tracker.get_slot("reason")
+        if not reason:
+            entities = tracker.latest_message.get("entities") or []
+            for entity in entities:
+                if entity.get("entity") == "reason":
+                    reason = entity.get("value")
+                    break
+        if not reason and expect_free_reason:
+            text_reason = (tracker.latest_message.get("text") or "").strip()
+            if text_reason and intent not in ("affirm", "deny"):
+                reason = text_reason
         mood = tracker.get_slot("mood")
         print(f"[action_handle_pick_reason] intent={intent} reason={reason} mood={mood}")
 
@@ -153,16 +183,22 @@ class ActionHandlePickReason(Action):
             # Do NOT proceed to the support flow automatically for 'dont_know'.
             # Do not clear the 'mood' slot so we retain the user's emotional state
             # for future commands. Only clear the reason and support_stage.
-            return [SlotSet("reason", None), SlotSet("support_stage", None)]
+            return [
+                SlotSet("reason", None),
+                SlotSet("support_stage", None),
+                SlotSet("expect_free_reason", None),
+            ]
 
         # Acknowledge other selected reasons - generic response for now
         # Otherwise, if the user picked (or typed) a reason, continue to support flow
         if reason:
-            # remove chitchat 'thanks' message; instead send a small divider and
-            # proceed to the support flow. The 'dont_know' case is handled above.
             dispatcher.utter_message(response="utter_divider")
             # After a user picks a reason, proceed to the supportive activities flow
-            return [SlotSet("reason", reason), FollowupAction("action_handle_support_flow")]
+            return [
+                SlotSet("reason", reason),
+                SlotSet("expect_free_reason", None),
+                FollowupAction("action_handle_support_flow"),
+            ]
 
         # Otherwise, do nothing
         return []
@@ -186,11 +222,31 @@ class ActionHandleSupportFlow(Action):
         stage = tracker.get_slot("support_stage")
         mood = tracker.get_slot("mood")
         reason = tracker.get_slot("reason")
+        support_completed = tracker.get_slot("support_completed")
 
         print(f"[action_handle_support_flow] intent={intent} stage={stage} mood={mood} reason={reason}")
 
+        # If a new mood was selected after completion, hand off to reflect flow.
+        if support_completed and intent in ("mood_happy", "mood_sad", "mood_angry"):
+            mood_map = {
+                "mood_happy": "happy",
+                "mood_sad": "sad",
+                "mood_angry": "angry",
+            }
+            next_mood = mood_map.get(intent)
+            return [
+                SlotSet("support_stage", None),
+                SlotSet("reason", None),
+                SlotSet("support_completed", None),
+                SlotSet("mood", next_mood),
+                SlotSet("last_mood", next_mood),
+                FollowupAction("action_start_reflect_flow"),
+            ]
+
         # If no stage set, start with common ground.
         if not stage:
+            if not reason:
+                return []
             dispatcher.utter_message(response="utter_stage_common_ground")
             dispatcher.utter_message(response="utter_stage_continue_question")
             return [SlotSet("support_stage", "common_ground")]
@@ -244,14 +300,17 @@ class ActionHandleSupportFlow(Action):
 
         if stage == "nuance":
             if intent == "affirm":
-                # Final step done
-                dispatcher.utter_message(response="utter_support_done")
-                # Keep 'mood' so we remember the user's current emotion for later.
-                return [SlotSet("support_stage", None), SlotSet("reason", None)]
+                # Final step done, then check if the mood has shifted.
+                dispatcher.utter_message(response="utter_support_done_check_mood")
+                return [
+                    SlotSet("support_stage", None),
+                    SlotSet("reason", None),
+                    SlotSet("support_completed", True),
+                ]
             elif intent == "deny":
                 dispatcher.utter_message(text="That’s okay — if you want to keep exploring another time, I’ll be right here.")
                 # Keep 'mood' so we remember the user's current emotion for later.
-                return [SlotSet("support_stage", None), SlotSet("reason", None)]
+                return [SlotSet("support_stage", None), SlotSet("reason", None), SlotSet("last_mood", None), SlotSet("mood", None)]
 
         # If none of the above matched, do nothing
         return []
@@ -273,3 +332,17 @@ class ActionGetStoredMood(Action):
         else:
             dispatcher.utter_message(text="I don't have a record of how you were feeling yet. Would you like to tell me?")
         return []
+    
+class ActionRestartConversation(Action):
+    def name(self) -> str:
+        return "action_restart_conversation"
+
+    async def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(response="utter_restart_ok")
+
+        # Restart clears the conversation state (including slots) back to the start.
+        # Then we immediately start your reflect/mood flow again.
+        return [
+            Restarted(),
+            FollowupAction("action_start_reflect_flow"),
+        ]

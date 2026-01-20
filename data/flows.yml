@@ -28,7 +28,7 @@ flows:
       # When user replies to the reason question, handle their Yes/No response
       - action: action_handle_reason_response
       - action: action_listen
-      # After the user sees the overview of common reasons, let them pick one
+      # After the user shares a reason or picks from the overview, handle it
       - action: action_handle_pick_reason
       - action: action_listen
       # Support flow - stage 1 (common_ground)

@@ -10,6 +10,7 @@ intents:
   - deny
   - pick_reason
   - check_mood
+  - restart
   - ask_question
 
 entities:
@@ -46,6 +47,14 @@ slots:
 
   support_stage:
     type: text
+    influence_conversation: false
+
+  expect_free_reason:
+    type: bool
+    influence_conversation: false
+
+  support_completed:
+    type: bool
     influence_conversation: false
 
   last_mood:
@@ -120,7 +129,7 @@ responses:
         # Note: removed "Continue without picking a reason" option as requested
 
   utter_ask_reason_after_affirm:
-    - text: "Great that you know why you are feeling {mood}. Which reason comes closest to why you are feeling this way?"
+    - text: "Thank you for sharing that you know why you feel {mood}. I'm listening — what happened?"
 
   utter_can_do_something_else:
     - text: "Thank you for sharing that with me. 🌿 If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
@@ -132,7 +141,7 @@ responses:
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
 
   utter_stage_common_ground:
-    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace. If you'd like to continue to something small, you can press 'Yes' below. If you'd like to continue to something small, you can press 'Yes' below."
+    - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace."
 
   utter_stage_acceptance:
     - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
@@ -154,8 +163,31 @@ responses:
   utter_support_done:
     - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."
 
+  utter_support_done_check_mood:
+    - text: "Thanks for going through that with me. Now that we've taken those steps, how are you feeling?"
+      buttons:
+        - title: "😡 Angry"
+          payload: "/mood_angry{{\"mood\":\"angry\"}}"
+        - title: "😕 Sad"
+          payload: "/mood_sad{{\"mood\":\"sad\"}}"
+        - title: "😊 Happy"
+          payload: "/mood_happy{{\"mood\":\"happy\"}}"
+
+  utter_followup_mood_happy:
+    - text: "I’m really glad you’re feeling better now. 💛 If you ever want to talk again, I’ll be right here."
+
+  utter_followup_mood_sad:
+    - text: "Thank you for telling me. If you’re still feeling sad, we can go gently again or take a small pause together."
+
+  utter_followup_mood_angry:
+    - text: "Thanks for sharing that you’re still feeling angry. We can take another round if you want, or pause and breathe."
+
   utter_divider:
     - text: "──────────"
+
+  utter_restart_ok:
+    - text: "Of course — we can start over. 💛"
+
  
 actions:
   - action_start_reflect_flow
@@ -163,3 +195,4 @@ actions:
   - action_handle_pick_reason
   - action_handle_support_flow
   - action_get_stored_mood
+  - action_restart_conversation

@@ -76,7 +76,7 @@ stories:
   - action: action_listen
   - intent: pick_reason
     user: |-
-      /pick_reason{"reason":"frustration"}
+      I'm tired
   - action: action_handle_pick_reason
   - action: utter_divider
   - action: action_handle_support_flow
@@ -97,7 +97,7 @@ stories:
   - action: action_listen
   - intent: pick_reason
     user: |-
-      /pick_reason{"reason":"tired"}
+      I miss my family
   - action: action_handle_pick_reason
   - action: utter_divider
   - action: action_handle_support_flow
