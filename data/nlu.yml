@@ -49,6 +49,12 @@ nlu:
     - nieuw gesprek
     - begin opnieuw
     - start again
+    - can we start over
+    - can we restart
+    - start over
+    - restart
+    - let's start again
+    - can we begin again
     - reset
 
 - intent: affirm
@@ -58,7 +64,6 @@ nlu:
     - absolutely
     - indeed
     - that's right
-    - correct
 
 - intent: deny
   examples: |
@@ -77,20 +82,14 @@ nlu:
     - I miss someone
     - I miss my family
     - I'm tired
-    - I feel frustrated
-    - Someone upset me
-    - I feel ignored
-    - It is too loud
-    - The environment is noisy
-    - Something changed at home
-    - I am worried about school
-    - Worried about school
+
 
 - intent: check_mood
   examples: |
     - What was I feeling earlier?
     - Do you remember how I was feeling?
     - How did I say I felt?
+    - What did I tell you I felt?
 
 - intent: ask_question
   examples: |
@@ -101,21 +100,11 @@ nlu:
     - why do I feel this way
     - what are some calming strategies
     - tell me about emotions
+    - how do I deal with frustration
     - what causes anger
+    - how can I express my feelings
+    - what should I do when I'm upset
+    - can you explain what anger means
+    - help me understand my feelings
     - what are triggers
-
-- intent: share_problem
-  examples: |
-    - someone hit me
-    - i got hit
-    - my friend hit me
-    - i am being bullied
-    - someone hurt me
-    - i am scared of my brother
-    - dad yelled at me
-    - i got pushed
-    - someone pushed me at school
-    - a kid pushed me
-    - i was attacked
-    - my teacher yelled at me
-    - people are mean to me
+    - how do I ask for help
