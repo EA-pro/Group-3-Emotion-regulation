@@ -423,6 +423,7 @@ class ActionHandleReframeFlow(Action):
         # Step 3: wrap up or loop if user adds more detail
         if stage == "wrap":
             if intent == "affirm":
+                dispatcher.utter_message(response="utter_reframe_gratitude")
                 dispatcher.utter_message(response="utter_support_done")
                 return [SlotSet("reframe_stage", None), SlotSet("reason_detail", None)]
             if intent == "deny":

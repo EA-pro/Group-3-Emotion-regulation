@@ -241,6 +241,9 @@ responses:
   utter_reframe_alternative:
     - text: "Here’s a gentler way to see it: even though {reason}, you’re already finding ways to cope. One small idea: take five slow breaths, hold something that reminds you of them, send a short message, and plan a tiny check-in so you feel connected."
 
+  utter_reframe_gratitude:
+    - text: "I’m really glad I could help with this. If you ever want to talk again or try another idea, I’m here for you. 💛"
+
   utter_restart_ok:
     - text: "Of course — we can start over. 💛"
 
