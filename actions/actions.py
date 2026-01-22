@@ -425,7 +425,14 @@ class ActionHandleReframeFlow(Action):
             if intent == "affirm":
                 dispatcher.utter_message(response="utter_reframe_gratitude")
                 dispatcher.utter_message(response="utter_support_done")
-                return [SlotSet("reframe_stage", None), SlotSet("reason_detail", None)]
+                # Clear stages so we don't re-enter the loop; mark support as completed
+                return [
+                    SlotSet("reframe_stage", None),
+                    SlotSet("reason_detail", None),
+                    SlotSet("support_stage", None),
+                    SlotSet("support_completed", True),
+                    SlotSet("reason", None),
+                ]
             if intent == "deny":
                 detail = self._clean_detail(user_text, detail_slot, reason)
                 alt_text = self._generate_reframe_text(reason, detail)
