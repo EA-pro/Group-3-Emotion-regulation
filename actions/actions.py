@@ -264,6 +264,9 @@ class ActionHandleSupportFlow(Action):
         """
         if not _has_user_text(tracker):
             return []
+        # If we're in the reframing flow, skip support flow to avoid looping.
+        if tracker.get_slot("reframe_stage"):
+            return []
         intent = tracker.latest_message.get("intent", {}).get("name")
         stage = tracker.get_slot("support_stage")
         mood = tracker.get_slot("mood")
