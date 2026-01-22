@@ -100,6 +100,10 @@ nlu:
     - I can’t be with them right now
     - I don’t have much contact with them
     - I miss my family
+    - Someone is bullying me
+    - Someone keeps bothering me at school
+    - I feel bullied
+    - kids are bullying me
 
 
 - intent: check_mood

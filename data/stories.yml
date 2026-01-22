@@ -155,6 +155,24 @@ stories:
   - intent: affirm
   - action: action_handle_reframe_flow
 
+- story: free text reason flows to reframe (sad)
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_reason_response
+  - action: utter_ask_reason_after_affirm
+  - action: action_listen
+  - intent: share_detail
+  - action: action_handle_pick_reason
+  - action: action_handle_reframe_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_reframe_flow
+
 - story: query stored mood
   steps:
   - intent: check_mood
