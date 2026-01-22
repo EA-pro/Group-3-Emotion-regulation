@@ -1,47 +1,47 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Function to stop background processes on exit
+# Stop background processes on exit
 cleanup() {
-    echo "Stopping servers..."
-    kill $FLASK_PID $RASA_PID $ACTION_PID 2>/dev/null
-    exit
+  echo "Stopping servers..."
+  kill ${FLASK_PID:-0} ${RASA_PID:-0} ${ACTION_PID:-0} 2>/dev/null || true
 }
+trap cleanup INT TERM
 
-# Set up trap to catch Ctrl+C
-trap cleanup INT
-
-# Check if Python is installed
-if ! command -v python &> /dev/null; then
-    echo "Python is not installed. Please install Python 3.8 or higher."
-    exit 1
+# Activate virtual environment (.venv preferred)
+if [ -d ".venv" ]; then
+  echo "Activating .venv..."
+  source .venv/bin/activate
+elif [ -d "venv" ]; then
+  echo "Activating venv..."
+  source venv/bin/activate
 fi
 
-# Activate virtual environment if it exists
-if [ -d "venv" ]; then
-    echo "Activating virtual environment..."
-    source venv/bin/activate
+# Load environment variables
+if [ -f ".env" ]; then
+  echo "Loading environment from .env..."
+  set -a
+  source .env
+  set +a
 fi
 
-# Check if Rasa is installed
-if ! command -v rasa &> /dev/null; then
-    echo "Rasa is not installed. Please install Rasa."
-    exit 1
-fi
+# Ensure deps exist
+command -v python >/dev/null || { echo "Python is not installed."; exit 1; }
+command -v rasa >/dev/null || { echo "Rasa is not installed."; exit 1; }
+command -v flask >/dev/null || { echo "Flask is not installed."; exit 1; }
 
-# Start Rasa server in background with explicit CORS settings
+export FLASK_APP=app
+
 echo "Starting Rasa server with CORS enabled..."
 rasa run --enable-api --cors "*" &
 RASA_PID=$!
 
-# Start Rasa Action server in background
 echo "Starting Rasa Action server..."
 rasa run actions &
 ACTION_PID=$!
 
-# Wait a moment to ensure servers have started
-sleep 10
+sleep 5
 
-# Start Flask server in background
 echo "Starting Flask server..."
 flask run &
 FLASK_PID=$!
@@ -52,5 +52,4 @@ echo "- Action Server: http://localhost:5055"
 echo "- Flask Server: http://localhost:5000"
 echo "Press Ctrl+C to stop all servers."
 
-# Wait for user to press Ctrl+C
 wait
