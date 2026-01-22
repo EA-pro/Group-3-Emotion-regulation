@@ -74,7 +74,7 @@ slots:
 
   reframe_stage:
     type: text
-    influence_conversation: false
+    influence_conversation: true
 
   riddle_question:
     type: text
