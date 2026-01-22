@@ -19,6 +19,22 @@ rules:
   - intent: summarize
   - action: action_generate_rapport
 
+- rule: Reframe affirm wraps up
+  condition:
+    - slot_was_set:
+        - reframe_stage: wrap
+  steps:
+    - intent: affirm
+    - action: action_handle_reframe_flow
+
+- rule: Reframe deny tries another angle
+  condition:
+    - slot_was_set:
+        - reframe_stage: wrap
+  steps:
+    - intent: deny
+    - action: action_handle_reframe_flow
+
 
 - rule: answer knowledge question
   steps:
