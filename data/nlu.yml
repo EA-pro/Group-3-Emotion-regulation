@@ -135,3 +135,11 @@ nlu:
     - give me a riddle
     - i want a riddle
     - let's do a riddle
+
+- intent: summarize
+  examples: |
+    - summarize this conversation
+    - can you make a report
+    - make a rapport of this chat
+    - summarize and save this chat
+    - can you write down what we talked about

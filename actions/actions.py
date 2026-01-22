@@ -3,6 +3,7 @@ import os
 import re
 import time
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -713,3 +714,61 @@ class ActionResetRiddle(Action):
             SlotSet("guess", None),
             SlotSet("riddle_trigger_text", None),
         ]
+
+
+class ActionGenerateRapport(Action):
+    def name(self) -> Text:
+        return "action_generate_rapport"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        """Summarize the conversation, log it to a txt file, and include a brief explanation."""
+        mood = tracker.get_slot("mood") or "unspecified"
+        reason = tracker.get_slot("reason") or "unspecified"
+        detail = tracker.get_slot("reason_detail") or ""
+
+        # Build a simple transcript from events
+        transcript_lines: List[str] = []
+        for ev in tracker.events:
+            if ev.get("event") == "user":
+                txt = ev.get("text") or ""
+                if txt:
+                    transcript_lines.append(f"User: {txt}")
+            elif ev.get("event") == "bot":
+                for msg in ev.get("data", {}).get("responses", []):
+                    if msg.get("text"):
+                        transcript_lines.append(f"Bot: {msg.get('text')}")
+                if ev.get("text"):
+                    transcript_lines.append(f"Bot: {ev.get('text')}")
+
+        # Brief explanation/rapport
+        explanation = (
+            f"Observed mood: {mood}. Reason shared: {reason}"
+            f"{' (' + detail + ')' if detail else ''}. "
+            "This rapport notes that the child may be feeling this way due to the stated reason; "
+            "validation and gentle coping steps remain important."
+        )
+
+        ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        file_path = logs_dir / f"rapport_{ts}.txt"
+
+        try:
+            with file_path.open("w", encoding="utf-8") as f:
+                f.write("Conversation transcript:\n")
+                f.write("\n".join(transcript_lines))
+                f.write("\n\nRapport/explanation:\n")
+                f.write(explanation)
+            dispatcher.utter_message(
+                text=f"I saved a conversation summary and rapport to {file_path}. "
+                     "It includes the transcript and a brief explanation of the feelings."
+            )
+        except Exception as e:  # pragma: no cover
+            dispatcher.utter_message(text=f"I couldn't save the rapport file ({e}).")
+
+        return []
