@@ -9,6 +9,7 @@ intents:
   - affirm
   - deny
   - pick_reason
+  - share_detail
   - check_mood
   - restart_conversation
   - ask_question
@@ -45,6 +46,14 @@ slots:
     mappings:
       - type: from_entity
         entity: reason
+      - type: from_text
+        intent: share_detail
+
+  reason_detail:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
 
   support_stage:
     type: text
@@ -59,6 +68,10 @@ slots:
     influence_conversation: false
 
   last_mood:
+    type: text
+    influence_conversation: false
+
+  reframe_stage:
     type: text
     influence_conversation: false
 
@@ -179,11 +192,11 @@ responses:
     - text: "One small reframe might help make the feeling a bit lighter. No pressure — it's just a gentle way to think about things differently. Shall we give it a try?"
 
   utter_stage_continue_question:
-    - text: "Would you like to continue?"
+    - text: "Do you agree with this point of view?"
       buttons:
         - title: "Yes"
           payload: '/affirm{{"affirmation":"yes"}}'
-        - title: "Not right now"
+        - title: "No"
           payload: '/deny{{"denial":"no"}}'
 
   utter_support_done:
@@ -211,6 +224,15 @@ responses:
   utter_divider:
     - text: "──────────"
 
+  utter_reframe_ask_more:
+    - text: "Can you share a bit more about {reason}? What’s the hardest part for you right now?"
+
+  utter_reframe_reflection:
+    - text: "It makes sense to feel {mood} about {reason}. From what you shared: {detail}. That shows you care a lot and are trying to stay connected."
+
+  utter_reframe_alternative:
+    - text: "Here’s a gentler way to see it: even though {reason}, you’re already finding ways to cope. One small idea: take five slow breaths, hold something that reminds you of them, send a short message, and plan a tiny check-in so you feel connected."
+
   utter_restart_ok:
     - text: "Of course — we can start over. 💛"
 
@@ -224,7 +246,9 @@ actions:
   - action_handle_pick_reason
   - action_handle_support_flow
   - action_get_stored_mood
+  - action_handle_reframe_flow
   - action_restart_conversation
+  - action_trigger_search
   - action_fetch_riddle
   - validate_riddle_form
   - action_reset_riddle

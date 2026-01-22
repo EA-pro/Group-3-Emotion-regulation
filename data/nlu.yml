@@ -80,8 +80,26 @@ nlu:
     - I don't really know
     - I don't know why
     - I miss someone
-    - I miss my family
     - I'm tired
+
+- intent: share_detail
+  examples: |
+    - I want to tell you more
+    - Let me explain more
+    - I miss my family
+    - I miss my brother
+    - I miss my sister
+    - I'm missing my friends
+    - I feel lonely because my family is far away
+    - I'm sad because my brother moved to another country
+    - I want to share more about why I'm sad
+    - Not being with them
+    - Not being with them much
+    - Not seeing them during the day
+    - They live abroad so I hardly see them
+    - I can’t be with them right now
+    - I don’t have much contact with them
+    - I miss my family
 
 
 - intent: check_mood

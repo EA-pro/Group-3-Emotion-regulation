@@ -76,13 +76,9 @@ stories:
   - action: action_listen
   - intent: pick_reason
     user: |-
-      I'm tired
+      /pick_reason{"reason":"frustration"}
   - action: action_handle_pick_reason
-  - action: utter_divider
-  - action: action_handle_support_flow
-  - action: action_listen
-  - intent: affirm
-  - action: action_handle_support_flow
+  - action: action_handle_reframe_flow
 
 - story: mood sad -> know reason? yes -> pick reason
   steps:
@@ -97,19 +93,67 @@ stories:
   - action: action_listen
   - intent: pick_reason
     user: |-
-      I miss my family
+      /pick_reason{"reason":"tired"}
   - action: action_handle_pick_reason
-  - action: utter_divider
-  - action: action_handle_support_flow
+  - action: action_handle_reframe_flow
   - action: action_listen
   - intent: affirm
-  - action: action_handle_support_flow
+  - action: action_handle_reframe_flow
+
+- story: reframe disagree loop
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"missing_someone"}
+  - action: action_handle_pick_reason
+  - action: action_handle_reframe_flow
+  - action: action_listen
+  - intent: deny
+  - action: action_handle_reframe_flow
+
+- story: reframe agree wrap
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"missing_someone"}
+  - action: action_handle_pick_reason
+  - action: action_handle_reframe_flow
   - action: action_listen
   - intent: affirm
-  - action: action_handle_support_flow
+  - action: action_handle_reframe_flow
+
+- story: share detail during support flow
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
   - action: action_listen
   - intent: affirm
-  - action: action_handle_support_flow
+  - action: action_handle_reason_response
+  - action: utter_ask_reason_after_affirm
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"missing_someone"}
+  - action: action_handle_pick_reason
+  - action: action_handle_reframe_flow
+  - action: action_listen
+  - intent: share_detail
+  - action: action_handle_reframe_flow
+  - action: action_listen
+  - intent: affirm
+  - action: action_handle_reframe_flow
 
 - story: query stored mood
   steps:

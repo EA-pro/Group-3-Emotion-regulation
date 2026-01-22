@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Text
 import os
 import re
 import time
+from datetime import datetime
 
 import requests
 from dotenv import load_dotenv
@@ -9,6 +10,11 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet, FollowupAction, Restarted
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
+
+try:
+    import litellm
+except ImportError:  # pragma: no cover
+    litellm = None
 
 load_dotenv()
 
@@ -210,18 +216,35 @@ class ActionHandlePickReason(Action):
             ]
 
         # Acknowledge other selected reasons - generic response for now
-        # Otherwise, if the user picked (or typed) a reason, continue to support flow
+        # Otherwise, if the user picked (or typed) a reason, continue to reframe flow
         if reason:
-            dispatcher.utter_message(response="utter_divider")
-            # After a user picks a reason, proceed to the supportive activities flow
+            friendly_reason = self._normalize_reason(reason)
+            # Log and proceed directly to the reframing flow
+            log_user_state(tracker.get_slot("mood"), friendly_reason)
             return [
-                SlotSet("reason", reason),
+                SlotSet("reason", friendly_reason),
                 SlotSet("expect_free_reason", None),
-                FollowupAction("action_handle_support_flow"),
+                FollowupAction("action_handle_reframe_flow"),
             ]
 
         # Otherwise, do nothing
         return []
+
+    @staticmethod
+    def _normalize_reason(reason: str) -> str:
+        """Turn reason codes into friendlier phrasing for conversation."""
+        mapping = {
+            "tired": "being tired",
+            "missing_someone": "missing someone",
+            "change_in_routine": "something changed at home",
+            "worry_school": "worrying about school",
+            "dont_know": "not sure",
+            "frustration": "feeling frustrated",
+            "someone_bothered_me": "someone upset you",
+            "feeling_ignored": "feeling ignored",
+            "overstimulation": "a noisy or overwhelming place",
+        }
+        return mapping.get(reason, str(reason).replace("_", " "))
 
 
 class ActionHandleSupportFlow(Action):
@@ -336,6 +359,137 @@ class ActionHandleSupportFlow(Action):
 
         # If none of the above matched, do nothing
         return []
+
+    @staticmethod
+    def _suggest_activity(reason: str) -> str:
+        """Provide a short, concrete next step tied to the user's reason."""
+        r_lower = (reason or "").lower()
+        if "miss" in r_lower:
+            return (
+                "Since you're missing someone, try this: place a photo or memory item nearby, take five 4-6 breaths (inhale 4, exhale 6), "
+                "send them a short note or voice message, and plan one small check-in time so you feel connected."
+            )
+        if "tired" in r_lower or "sleep" in r_lower:
+            return "Your body might need a reset: roll your shoulders, take five slow belly breaths, and stretch your neck gently side to side."
+        if "school" in r_lower:
+            return "Worried about school? Jot one small task you can finish today, then take a 3–3–3 breath (inhale 3, hold 3, exhale 3) before starting."
+        if "home" in r_lower or "routine" in r_lower or "change" in r_lower:
+            return "When things change at home, anchor yourself: press your feet into the floor, breathe in for 4 and out for 6, and name one thing that still feels steady."
+        if "angry" in r_lower or "frustrat" in r_lower:
+            return "For the anger: squeeze your fists, release, then try box breathing (4 in, 4 hold, 4 out, 4 hold) for three rounds."
+        return "Let's ground together: place a hand on your belly, take five slow breaths, and notice one thing you can see, hear, and feel right now."
+
+
+class ActionHandleReframeFlow(Action):
+    def name(self) -> str:
+        return "action_handle_reframe_flow"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[str, Any],
+    ) -> List[Dict[str, Any]]:
+        """Reframe immediately: reflect + alternative suggestion, then offer to continue."""
+        intent = tracker.latest_message.get("intent", {}).get("name")
+        stage = tracker.get_slot("reframe_stage")
+        mood = tracker.get_slot("mood") or "this feeling"
+        reason = tracker.get_slot("reason") or "this situation"
+        user_text = (tracker.latest_message.get("text") or "").strip()
+        detail_slot = tracker.get_slot("reason_detail")
+
+        print(f"[action_handle_reframe_flow] intent={intent} stage={stage} mood={mood} reason={reason} detail={detail_slot}")
+
+        # Step 1: immediate reframe (no consent question)
+        if not stage:
+            detail = self._clean_detail(user_text, detail_slot, reason)
+            reframe_text = self._generate_reframe_text(reason, detail)
+            dispatcher.utter_message(text=reframe_text)
+            dispatcher.utter_message(response="utter_stage_continue_question")
+            return [
+                SlotSet("reframe_stage", "wrap"),
+                SlotSet("reason_detail", detail),
+            ]
+
+        # Step 2: reflect and reframe
+        if stage == "reframe":
+            detail = self._clean_detail(user_text, detail_slot, reason)
+            reframe_text = self._generate_reframe_text(reason, detail)
+            dispatcher.utter_message(text=reframe_text)
+            dispatcher.utter_message(response="utter_stage_continue_question")
+            return [SlotSet("reframe_stage", "wrap"), SlotSet("reason_detail", detail)]
+
+        # Step 3: wrap up or loop if user adds more detail
+        if stage == "wrap":
+            if intent == "affirm":
+                dispatcher.utter_message(response="utter_support_done")
+                return [SlotSet("reframe_stage", None), SlotSet("reason_detail", None)]
+            if intent == "deny":
+                detail = self._clean_detail(user_text, detail_slot, reason)
+                alt_text = self._generate_reframe_text(reason, detail)
+                dispatcher.utter_message(text="Let's try another angle.")
+                dispatcher.utter_message(text=alt_text)
+                dispatcher.utter_message(response="utter_stage_continue_question")
+                return [
+                    SlotSet("reframe_stage", "wrap"),
+                    SlotSet("reason_detail", detail),
+                ]
+            if user_text:
+                # New detail—loop back into reframe
+                cleaned = self._clean_detail(user_text, detail_slot, reason)
+                return [
+                    SlotSet("reason_detail", cleaned),
+                    SlotSet("reframe_stage", "reframe"),
+                    FollowupAction("action_handle_reframe_flow"),
+                ]
+            dispatcher.utter_message(response="utter_stage_continue_question")
+            return []
+
+        return []
+
+    @staticmethod
+    def _clean_detail(user_text: str, detail_slot: Any, reason: str) -> str:
+        """Clean incoming detail to avoid showing raw command payloads."""
+        candidate = detail_slot or user_text or reason or ""
+        text = str(candidate).strip()
+        if text.startswith("/"):
+            return reason.replace("_", " ")
+        return text.replace("_", " ")
+
+    @staticmethod
+    def _generate_reframe_text(reason: str, detail: str) -> str:
+        """Generate a dynamic reframe with LLM; fall back to static suggestion."""
+        fallback = ActionHandleSupportFlow._suggest_activity(reason)
+        if not litellm:
+            return fallback
+        prompt = (
+            "You are a brief, supportive coach. Reframe the situation to reduce distress "
+            "and suggest one concrete, calming next step. Keep it to 2 short sentences. "
+            f"Reason: {reason}. Detail: {detail or reason}."
+        )
+        try:
+            resp = litellm.completion(
+                model="gemini/gemini-pro",
+                messages=[{"role": "user", "content": prompt}],
+                api_key=os.getenv("GEMINI_API_KEY"),
+                timeout=10,
+            )
+            text = resp.choices[0].message["content"]
+            return text.strip() if text else fallback
+        except Exception as e:  # pragma: no cover
+            print(f"[action_handle_reframe_flow] llm fallback due to error: {e}")
+            return fallback
+
+
+def log_user_state(mood: Any, reason: Any) -> None:
+    """Append mood/reason selections to a local text log for simple traceability."""
+    try:
+        os.makedirs("logs", exist_ok=True)
+        ts = datetime.utcnow().isoformat()
+        with open("logs/user_state.log", "a", encoding="utf-8") as f:
+            f.write(f"{ts}\tmood={mood or ''}\treason={reason or ''}\n")
+    except Exception as e:
+        print(f"[log_user_state] failed to write log: {e}")
 
 
 class ActionGetStoredMood(Action):
