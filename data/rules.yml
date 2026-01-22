@@ -7,6 +7,13 @@ rules:
   - intent: restart_conversation
   - action: action_restart_conversation
 
+- rule: Play a riddle on request
+  steps:
+  - intent: play_riddle
+  - action: action_fetch_riddle
+  - action: riddle_form
+  - active_loop: riddle_form
+
 
 - rule: answer knowledge question
   steps:

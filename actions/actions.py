@@ -552,8 +552,6 @@ class ActionFetchRiddle(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        if not _has_user_text(tracker):
-            return []
         api_key = os.getenv("API_NINJAS_KEY")
         if not api_key:
             dispatcher.utter_message(text="Riddle API key is missing on the server.")

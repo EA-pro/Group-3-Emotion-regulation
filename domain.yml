@@ -174,7 +174,14 @@ responses:
     - text: "Thank you for sharing that with me. 🌿 If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
 
   utter_reason_unknown_exercise:
-    - text: "It’s completely okay not to know. 💛 Let’s give your heart and body a moment to settle. How about a tiny calm break and take a slow sip of water."
+    - text: "It’s completely okay not to know. 💛 Let’s give your heart and body a moment to settle. How about a tiny calm break and take a slow sip of water. What would you like to do next?"
+      buttons:
+        - title: "🔍 Show me common reasons"
+          payload: '/affirm{{"affirmation":"yes"}}'
+        - title: "🎯 Play a riddle"
+          payload: "/play_riddle"
+        - title: "💬 Just talk"
+          payload: "/greet"
 
   utter_reason_unknown_ask_later: 
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
