@@ -159,3 +159,10 @@ stories:
   steps:
   - intent: check_mood
   - action: action_get_stored_mood
+
+- story: play riddle directly
+  steps:
+  - intent: play_riddle
+  - action: action_fetch_riddle
+  - action: riddle_form
+  - active_loop: riddle_form
