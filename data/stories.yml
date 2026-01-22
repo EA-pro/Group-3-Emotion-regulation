@@ -166,3 +166,27 @@ stories:
   - action: action_fetch_riddle
   - action: riddle_form
   - active_loop: riddle_form
+
+- story: play riddle after unknown reason (sad)
+  steps:
+  - intent: mood_sad
+  - slot_was_set:
+    - mood: sad
+  - action: action_start_reflect_flow
+  - action: action_listen
+  - intent: deny
+  - action: action_handle_reason_response
+  - action: utter_acknowledge_uneasy_feeling
+  - action: utter_overview_common_reasons_sad
+  - action: action_listen
+  - intent: pick_reason
+    user: |-
+      /pick_reason{"reason":"dont_know"}
+  - action: action_handle_pick_reason
+  - action: utter_reason_unknown_exercise
+  - action: utter_reason_unknown_ask_later
+  - action: action_listen
+  - intent: play_riddle
+  - action: action_fetch_riddle
+  - action: riddle_form
+  - active_loop: riddle_form
