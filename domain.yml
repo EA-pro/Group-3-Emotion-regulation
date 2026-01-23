@@ -260,7 +260,19 @@ responses:
   utter_ask_riddle_form_guess:
     - text: "What's your guess?"
 
-
+  utter_free_chitchat_response:
+    - text: "placeholder"
+      metadata:
+        rephrase: True
+        rephrase_prompt: |
+          The following is a conversation with an AI assistant built with Rasa.
+          The assistant can talk about itself and that (itself)Feelix is made to guide you through psychological steps to ensure you feel better after a short chat.
+          if you want you can go through these steps or if you dont know why you are feeling a certain way you can try some of my riddles!
+          Greet me to go through my steps or ask me to play a riddle.
+          Here is context / previous conversation with the user:
+          {{history}}
+          {{current_input}}
+          Suggested AI Response:
  
 actions:
   - action_start_reflect_flow
