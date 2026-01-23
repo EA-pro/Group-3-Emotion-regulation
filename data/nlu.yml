@@ -73,6 +73,16 @@ nlu:
     - never
     - that's not right
 
+- intent: not_feeling_better
+  examples: |
+    - not feeling better
+    - i don't feel better
+    - i still feel bad
+    - i still feel sad
+    - i still feel angry
+    - no, not better
+    - not really
+
 - intent: pick_reason
   examples: |
     - I don't know

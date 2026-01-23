@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.15.7"
 
 
 rules:
@@ -11,8 +11,6 @@ rules:
   steps:
   - intent: play_riddle
   - action: action_fetch_riddle
-  - action: riddle_form
-  - active_loop: riddle_form
 
 - rule: Summarize conversation on request
   steps:
@@ -49,29 +47,30 @@ rules:
   - active_loop: null
   - action: action_reset_riddle
 
-- rule: handle mood after support completion (happy)
+- rule: prompt after support completion
   condition:
   - slot_was_set:
     - support_completed: true
   steps:
   - action: utter_support_done_check_mood
+  - action: action_listen
+
+- rule: support completion feeling better
+  condition:
+  - slot_was_set:
+    - support_completed: true
+  steps:
   - intent: mood_happy
-  - action: action_start_reflect_flow
+  - action: utter_followup_mood_happy
+  - action: action_clear_support_state
+  - action: action_listen
 
-- rule: handle mood after support completion (sad)
+- rule: support completion not feeling better
   condition:
   - slot_was_set:
     - support_completed: true
   steps:
-  - action: utter_support_done_check_mood
-  - intent: mood_sad
-  - action: action_start_reflect_flow
-
-- rule: handle mood after support completion (angry)
-  condition:
-  - slot_was_set:
-    - support_completed: true
-  steps:
-  - action: utter_support_done_check_mood
-  - intent: mood_angry
-  - action: action_start_reflect_flow
+  - intent: not_feeling_better
+  - action: utter_followup_not_better
+  - action: action_clear_support_state
+  - action: action_listen

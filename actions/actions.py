@@ -206,7 +206,7 @@ class ActionHandlePickReason(Action):
         # If the user selected or wrote "I don't know" - stop support flow
         if reason == "dont_know":
             dispatcher.utter_message(response="utter_reason_unknown_exercise")
-            dispatcher.utter_message(response="utter_reason_unknown_ask_later")
+            #dispatcher.utter_message(response="utter_reason_unknown_ask_later")
             # Do NOT proceed to the support flow automatically for 'dont_know'.
             # Do not clear the 'mood' slot so we retain the user's emotional state
             # for future commands. Only clear the reason and support_stage.
@@ -216,16 +216,22 @@ class ActionHandlePickReason(Action):
                 SlotSet("expect_free_reason", None),
             ]
 
-        # Acknowledge other selected reasons - generic response for now
-        # Otherwise, if the user picked (or typed) a reason, continue to reframe flow
+        # Otherwise, if the user picked (or typed) a reason:
+        # - free-text reasons (after "Yes") go to the reframe flow
+        # - button-picked reasons go to the support flow
         if reason:
             friendly_reason = self._normalize_reason(reason)
-            # Log and proceed directly to the reframing flow
             log_user_state(tracker.get_slot("mood"), friendly_reason)
+            if expect_free_reason:
+                return [
+                    SlotSet("reason", friendly_reason),
+                    SlotSet("expect_free_reason", None),
+                    FollowupAction("action_handle_reframe_flow"),
+                ]
             return [
                 SlotSet("reason", friendly_reason),
                 SlotSet("expect_free_reason", None),
-                FollowupAction("action_handle_reframe_flow"),
+                FollowupAction("action_handle_support_flow"),
             ]
 
         # Otherwise, do nothing
@@ -272,6 +278,23 @@ class ActionHandleSupportFlow(Action):
         mood = tracker.get_slot("mood")
         reason = tracker.get_slot("reason")
         support_completed = tracker.get_slot("support_completed")
+
+        # Allow off-path intents to interrupt the support flow gracefully.
+        if intent == "play_riddle":
+            return [
+                SlotSet("support_stage", None),
+                SlotSet("reason", None),
+                SlotSet("expect_free_reason", None),
+                FollowupAction("action_fetch_riddle"),
+            ]
+        if intent == "greet":
+            dispatcher.utter_message(response="utter_supportive_message")
+            dispatcher.utter_message(response="utter_ask_mood_intro")
+            return [
+                SlotSet("support_stage", None),
+                SlotSet("reason", None),
+                SlotSet("expect_free_reason", None),
+            ]
 
         print(f"[action_handle_support_flow] intent={intent} stage={stage} mood={mood} reason={reason}")
 
@@ -540,6 +563,24 @@ class ActionRestartConversation(Action):
         ]
 
 
+class ActionClearSupportState(Action):
+    def name(self) -> str:
+        return "action_clear_support_state"
+
+    def run(self, dispatcher, tracker, domain):
+        if not _has_user_text(tracker):
+            return []
+        return [
+            SlotSet("mood", None),
+            SlotSet("reason", None),
+            SlotSet("reason_detail", None),
+            SlotSet("support_stage", None),
+            SlotSet("support_completed", None),
+            SlotSet("reframe_stage", None),
+            SlotSet("expect_free_reason", None),
+        ]
+
+
 def _normalize_riddle_text(text: str) -> str:
     if not text:
         return ""
@@ -607,6 +648,7 @@ class ActionFetchRiddle(Action):
             SlotSet("riddle_attempts", 0),
             SlotSet("guess", None),
             SlotSet("riddle_trigger_text", tracker.latest_message.get("text")),
+            FollowupAction("riddle_form"),
         ]
 
 
@@ -689,7 +731,10 @@ class ValidateRiddleForm(FormValidationAction):
             dispatcher.utter_message(text="Yes! That's correct.")
             return {
                 "guess": value,
-                "riddle_attempts": attempts,
+                "requested_slot": None,
+                "riddle_question": None,
+                "riddle_answer": None,
+                "riddle_attempts": None,
                 "riddle_trigger_text": None,
             }
 
@@ -703,7 +748,10 @@ class ValidateRiddleForm(FormValidationAction):
         dispatcher.utter_message(text=f"Nope — third try. The answer was: {answer}.")
         return {
             "guess": value,
-            "riddle_attempts": attempts,
+            "requested_slot": None,
+            "riddle_question": None,
+            "riddle_answer": None,
+            "riddle_attempts": None,
             "riddle_trigger_text": None,
         }
 

@@ -6,6 +6,7 @@ intents:
   - mood_happy
   - mood_sad
   - mood_angry
+  - not_feeling_better
   - affirm
   - deny
   - pick_reason
@@ -118,14 +119,15 @@ responses:
   utter_ask_mood:
     - text: "Before we talk, can you show me how you are feeling by choosing an emoji that fits your mood? 🤔"
 
+
   utter_reflect_mood_happy:
     - text: "Yay, you’re feeling happy! 😊 That makes me smile too. And if you ever have a tough moment or feel upset, you can always come back to me. I’m here for you, every single time."
 
   utter_reflect_mood_sad:
-    - text: "It’s okay to feel sad. 💙 Thank you for trusting me and telling me. Sad feelings can feel heavy, but you’re not alone, we can take this slowly together."
+    - text: "It’s okay to feel sad. Thank you for trusting me and telling me. Sad feelings can feel heavy, but you’re not alone, we can take this slowly together."
 
   utter_reflect_mood_angry:
-    - text: "It sounds like you're feeling really angry right now. 😠 That's okay, big feelings can be tough to hold. I'm right here with you, and we can take some calm steps together to help your body settle down."
+    - text: "It sounds like you're feeling really angry right now. That's okay, big feelings can be tough to hold. I'm right here with you, and we can take some calm steps together to help your body settle down."
 
   utter_reason_why_you_feel_upset_question:
     - text: "Let's slow down for a moment. 💛 Do you know what made you feel upset?"
@@ -137,6 +139,7 @@ responses:
 
   utter_acknowledge_uneasy_feeling:
     - text: "That’s completely okay. 💛 Sometimes our heart feels a bit heavy even if we don’t really know why."
+
 
   utter_overview_common_reasons_sad:
     - text: "Here are some common reasons children might feel sad:" 
@@ -151,7 +154,7 @@ responses:
           payload: '/pick_reason{{"reason":"worry_school"}}'
         - title: "I don't know"
           payload: '/pick_reason{{"reason":"dont_know"}}'
-        # Note: removed "Continue without picking a reason" option as requested
+
 
   utter_overview_common_reasons_angry:
     - text: "Here are some common reasons children might feel angry:"
@@ -166,13 +169,16 @@ responses:
           payload: '/pick_reason{{"reason":"overstimulation"}}'
         - title: "I don't know"
           payload: '/pick_reason{{"reason":"dont_know"}}'
-        # Note: removed "Continue without picking a reason" option as requested
+
 
   utter_ask_reason_after_affirm:
     - text: "Thank you for sharing that you know why you feel {mood}. I'm listening — what happened?"
 
+
+
   utter_can_do_something_else:
-    - text: "Thank you for sharing that with me. 🌿 If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
+    - text: "Thank you for sharing that with me. If you'd like, you can tell me a bit more, or we can try something gentle together to help your body calm down — what feels best for you right now?"
+
 
   utter_reason_unknown_exercise:
     - text: "It’s completely okay not to know. 💛 Let’s give your heart and body a moment to settle. How about a tiny calm break and take a slow sip of water. What would you like to do next?"
@@ -187,6 +193,7 @@ responses:
   utter_reason_unknown_ask_later: 
     - text: "💛. Sometimes it takes time to understand a feeling. If later on you start to notice what made you feel this way, you can always come back and tell me. I’ll be right here."
 
+
   utter_stage_common_ground:
     - text: "I hear that you're feeling {mood} because of {reason}. Thank you for sharing that with me — that took courage. We don't need to understand everything right now — we can just be here together, at your pace."
 
@@ -194,10 +201,10 @@ responses:
     - text: "It's totally okay to feel this way. There's no need to fix or explain it. When you're ready, we can look gently at what happened to make it feel bigger. Would you like to continue?"
 
   utter_stage_analysis:
-    - text: "Sometimes noticing small details can help. We can look together for one small thing that might have made this stronger. Would you like to continue to the next step?"
+    - text: "Think of what really happened, was it actually so bad or now that you relaxed a bit was it maybe not as big as you initially thought?"
 
   utter_stage_nuance:
-    - text: "One small reframe might help make the feeling a bit lighter. No pressure — it's just a gentle way to think about things differently. Shall we give it a try?"
+    - text: "Now that youve thought about it was it really as bad or maybe its just one little thing and life goes on. Just keep relaxing like Feelix says ;)"
 
   utter_stage_continue_question:
     - text: "Do you agree with this point of view?"
@@ -211,14 +218,12 @@ responses:
     - text: "Thanks for going through that. If you ever want to do it again or explore more, I’m here for you."
 
   utter_support_done_check_mood:
-    - text: "Thanks for going through that with me. Now that we've taken those steps, how are you feeling?"
+    - text: "Now that we've taken those steps, are you feeling better?"
       buttons:
-        - title: "😡 Angry"
-          payload: "/mood_angry{{\"mood\":\"angry\"}}"
-        - title: "😕 Sad"
-          payload: "/mood_sad{{\"mood\":\"sad\"}}"
-        - title: "😊 Happy"
+        - title: "😊 Feeling better"
           payload: "/mood_happy{{\"mood\":\"happy\"}}"
+        - title: "Not feeling better"
+          payload: "/not_feeling_better"
 
   utter_followup_mood_happy:
     - text: "I’m really glad you’re feeling better now. 💛 If you ever want to talk again, I’ll be right here."
@@ -229,8 +234,13 @@ responses:
   utter_followup_mood_angry:
     - text: "Thanks for sharing that you’re still feeling angry. We can take another round if you want, or pause and breathe."
 
+  utter_followup_not_better:
+    - text: "Thanks for telling me. We can pause here. If you want to start again, just say hi."
+
   utter_divider:
     - text: "──────────"
+
+
 
   utter_reframe_ask_more:
     - text: "Can you share a bit more about {reason}? What’s the hardest part for you right now?"
@@ -250,6 +260,7 @@ responses:
   utter_ask_riddle_form_guess:
     - text: "What's your guess?"
 
+
  
 actions:
   - action_start_reflect_flow
@@ -259,8 +270,8 @@ actions:
   - action_get_stored_mood
   - action_handle_reframe_flow
   - action_restart_conversation
-  - action_trigger_search
   - action_fetch_riddle
   - validate_riddle_form
   - action_reset_riddle
   - action_generate_rapport
+  - action_clear_support_state
