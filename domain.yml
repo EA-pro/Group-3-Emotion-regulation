@@ -261,18 +261,21 @@ responses:
     - text: "What's your guess?"
 
   utter_free_chitchat_response:
-    - text: "placeholder"
+    - text: "chitchat is called"
       metadata:
         rephrase: True
         rephrase_prompt: |
           The following is a conversation with an AI assistant built with Rasa.
           The assistant can talk about itself and that (itself)Feelix is made to guide you through psychological steps to ensure you feel better after a short chat.
           if you want you can go through these steps or if you dont know why you are feeling a certain way you can try some of my riddles!
-          Greet me to go through my steps or ask me to play a riddle.
+          It needs to specifically mention that it can start the conversation again via greeting me to go through my steps or ask me to play a riddle.
           Here is context / previous conversation with the user:
           {{history}}
           {{current_input}}
           Suggested AI Response:
+
+  utter_search_followup:
+    - text: "If you'd like, we can start again — say hi to go through my steps, or ask me to play a riddle."
  
 actions:
   - action_start_reflect_flow
@@ -287,3 +290,4 @@ actions:
   - action_reset_riddle
   - action_generate_rapport
   - action_clear_support_state
+  - action_restart_to_greeting

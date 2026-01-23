@@ -563,6 +563,21 @@ class ActionRestartConversation(Action):
         ]
 
 
+class ActionRestartToGreeting(Action):
+    def name(self) -> str:
+        return "action_restart_to_greeting"
+
+    def run(self, dispatcher, tracker, domain):
+        if not _has_user_text(tracker):
+            return []
+        return [
+            Restarted(),
+            FollowupAction("utter_supportive_message"),
+            FollowupAction("utter_ask_mood_intro"),
+            FollowupAction("action_listen"),
+        ]
+
+
 class ActionClearSupportState(Action):
     def name(self) -> str:
         return "action_clear_support_state"
@@ -579,6 +594,8 @@ class ActionClearSupportState(Action):
             SlotSet("reframe_stage", None),
             SlotSet("expect_free_reason", None),
         ]
+
+
 
 
 def _normalize_riddle_text(text: str) -> str:
@@ -648,7 +665,7 @@ class ActionFetchRiddle(Action):
             SlotSet("riddle_attempts", 0),
             SlotSet("guess", None),
             SlotSet("riddle_trigger_text", tracker.latest_message.get("text")),
-            FollowupAction("riddle_form"),
+            FollowupAction("riddle_form")
         ]
 
 

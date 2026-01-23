@@ -46,8 +46,19 @@ flows:
       # Support flow - completion
       - action: action_handle_support_flow
 
+
+  play_riddle:
+    description: "Start a riddle game when user wants to play or hear a riddle"
+    steps:
+      - action: action_fetch_riddle
+      - action: riddle_form
+      - action: action_reset_riddle
+
   pattern_search:
-    description: handle a knowledge-based question or request
+    description: "Answer factual, informational questions from the knowledge base. Do NOT use for games, riddles, or entertainment requests."
     name: pattern search
     steps:
       - action: action_trigger_search      
+      - action: utter_search_followup
+      - action: action_restart_to_greeting
+
